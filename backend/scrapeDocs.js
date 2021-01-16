@@ -4,7 +4,7 @@
 *   OUTPUT: HTML string
 */
 // holds the really ugly import string for google fonts
-const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Lato&family=Montserrat&family=Open+Sans&family=Poppins&family=Roboto&display=swap');\n    </style>"
+const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Lato&family=Montserrat&family=Open+Sans&family=Poppins&family=Roboto&display=swap');\n</style>"
 
 function docToHTML (doc) {
   // main string that stores HTML (yes this is a little janky)
@@ -12,7 +12,7 @@ function docToHTML (doc) {
   // create title for webpage and HTML <head> tag
   html = parseTitle(html, doc.title)
   html += '\n<body '
-  html = addBackgroundColor(html, doc)
+  // html = addBackgroundColor(html, doc)
   html += '>\n'
   // import fonts and start of body tag
   html += fontString
@@ -20,7 +20,7 @@ function docToHTML (doc) {
   // parse the body, adding html elements
   html = parseBody(html, doc.body)
   // add last body tag
-  html += '\n</body>'
+  html += '</body>'
   return html
 }
 
@@ -46,17 +46,12 @@ function parseTitle (html, title) {
 // NOTE: only capable of parsing text at this point. Completely freezes if an image is at play.
 function parseBody (html, body) {
   // loop through each element in the content
-  for (i = 0; i < body.content.length; i++) {
+  for (var i = 0; i < body.content.length; i++) {
     // skip object describing section (for now)
     if (!('startIndex' in body.content[i])) {
       continue
     }
-    paragraph = body.content[i].paragraph
-    for (j = 0; j < paragraph.elements.length; j++) {
-      console.log(paragraph.elements[j])
-      // text = paragraph.elements[j].textRun.content;
-      // console.log(text);
-    }
+    html = processParagraph(body.content[i], html, body)
   }
   return html
 }
@@ -67,188 +62,120 @@ function parseBody (html, body) {
 const fs = require('fs')
 const rawdata = fs.readFileSync('testDoc.json')
 const doc = JSON.parse(rawdata)
-console.log(docToHTML(doc))
 fs.writeFile('test.html', docToHTML(doc), function (err) {
   if (err) throw err
   console.log('Updated!')
 })
-console.log(doc.body)
 
 // ConvertGoogleDocToCleanHtml(doc);
 
 // RANDOM GITHUB SCRIPT TESTING
-function ConvertGoogleDocToCleanHtml (doc) {
-  var body = doc.body.content
-  var numChildren = body.length
-  var output = []
-  var images = []
-  var listCounters = {}
+// function ConvertGoogleDocToCleanHtml (doc) {
+//   var body = doc.body.content
+//   var numChildren = body.length
+//   var output = []
+//   var images = []
+//   var listCounters = {}
 
-  // Walk through all the child elements of the body.
-  for (var i = 0; i < numChildren; i++) {
-    var child = body.content[i]
-    output.push(processItem(child, listCounters, images, doc))
-  }
+//   // Walk through all the child elements of the body.
+//   for (var i = 0; i < numChildren; i++) {
+//     var child = body.content[i]
+//     output.push(processItem(child, listCounters, images, doc))
+//   }
 
-  var html = output.join('\r')
-  // emailHtml(html, images);
-  console.log(html)
-  // createDocumentForHtml(html, images);
-}
+//   var html = output.join('\r')
+//   // emailHtml(html, images);
+//   console.log(html)
+//   // createDocumentForHtml(html, images);
+// }
 
-function emailHtml (html, images) {
-  var attachments = []
-  for (var j = 0; j < images.length; j++) {
-    attachments.push({
-      fileName: images[j].name,
-      mimeType: images[j].type,
-      content: images[j].blob.getBytes()
-    })
-  }
-}
+// function emailHtml (html, images) {
+//   var attachments = []
+//   for (var j = 0; j < images.length; j++) {
+//     attachments.push({
+//       fileName: images[j].name,
+//       mimeType: images[j].type,
+//       content: images[j].blob.getBytes()
+//     })
+//   }
+// }
 
-function createDocumentForHtml (html, images) {
-  var name = DocumentApp.getActiveDocument().getName() + '.html'
-  var newDoc = DocumentApp.create(name)
-  newDoc.getBody().setText(html)
-  for (var j = 0; j < images.length; j++) { newDoc.getBody().appendImage(images[j].blob) }
-  newDoc.saveAndClose()
-}
-
-function processItem (item, listCounters, images, doc) {
-  var output = []
-  var prefix = ''; var suffix = ''
-
-  if ('paragraph' in item) {
-    switch (item.paragraph.paragraphStyle.namedStyleType) {
-      // Add a # for each heading level. No break, so we accumulate the right number.
-      case 'HEADING_6':
-        prefix = '<h6>'
-        suffix = '</h6>'
-        break
-      case 'HEADING_5':
-        prefix = '<h5>'
-        suffix = '</h5>'
-        break
-      case 'HEADING_4':
-        prefix = '<h4>'
-        suffix = '</h4>'
-        break
-      case 'HEADING_3':
-        prefix = '<h3>'
-        suffix = '</h3>'
-        break
-      case 'HEADING_2':
-        prefix = '<h2>'
-        suffix = '</h2>'
-        break
-      case 'HEADING_1':
-        prefix = '<h1>'
-        suffix = '</h1>'
-        break
-      default:
-        prefix = '<p>'
-        suffix = '</p>'
-    }
-
-    if (item.elements.length === 0) { return '' }
-  } else if ('inlineObjectElement' in item) {
-    processImage(item, images, output, doc)
-  }
-  // else if ('bullet' in item) {
-  //   var listItem = item
-  //   var gt = listItem.getGlyphType()
-  //   var key = listItem.getListId() + '.' + listItem.getNestingLevel()
-  //   var counter = listCounters[key] || 0
-
-  //   // First list item
-  //   if (counter == 0) {
-  //     // Bullet list (<ul>):
-  //     if (gt === DocumentApp.GlyphType.BULLET ||
-  //           gt === DocumentApp.GlyphType.HOLLOW_BULLET ||
-  //           gt === DocumentApp.GlyphType.SQUARE_BULLET) {
-  //       prefix = '<ul><li>', suffix = '</li>'
-
-  //       suffix += '</ul>'
-  //     } else {
-  //       // Ordered list (<ol>):
-  //       prefix = '<ol><li>', suffix = '</li>'
-  //     }
-  //   } else {
-  //     prefix = '<li>'
-  //     suffix = '</li>'
-  //   }
-
-  //   if (item.isAtDocumentEnd() || (item.getNextSibling() && (item.getNextSibling().getType() != DocumentApp.ElementType.LIST_ITEM))) {
-  //     if (gt === DocumentApp.GlyphType.BULLET ||
-  //           gt === DocumentApp.GlyphType.HOLLOW_BULLET ||
-  //           gt === DocumentApp.GlyphType.SQUARE_BULLET) {
-  //       suffix += '</ul>'
-  //     } else {
-  //       // Ordered list (<ol>):
-  //       suffix += '</ol>'
-  //     }
-  //   }
-
-  //   counter++
-  //   listCounters[key] = counter
-  // }
-
-  output.push(prefix)
-
-  if ('textRun' in item) {
-    processText(item, output, doc)
-  } else {
-    if ('elements' in item) {
-      var numChildren = item.elements.length
-
-      // Walk through all the child elements of the doc.
-      for (var i = 0; i < numChildren; i++) {
-        var child = item.elements[i]
-        output.push(processItem(child, listCounters, images))
-      }
-    }
-  }
-
-  output.push(suffix)
-  return output.join('')
-}
+// function createDocumentForHtml (html, images) {
+//   var name = DocumentApp.getActiveDocument().getName() + '.html'
+//   var newDoc = DocumentApp.create(name)
+//   newDoc.getBody().setText(html)
+//   for (var j = 0; j < images.length; j++) { newDoc.getBody().appendImage(images[j].blob) }
+//   newDoc.saveAndClose()
+// }
 
 function processParagraph (item, html, doc) {
-  html += '<div class=' + item.paragraph.paragraphStyles.namedStyleType + '>'
-
-  var numElements = item.elements.length
-
-  for (var i; i < numElements; i++) {
-    processElement(item[i])
+  html += '\n'
+  html += '<div class=' + item.paragraph.paragraphStyle.namedStyleType + '>'
+  html += '\n'
+  var numElements = item.paragraph.elements.length
+  for (var i = 0; i < numElements; i++) {
+    html = processElement(item.paragraph.elements[i], html, doc)
   }
 
   html += '</div>'
+  html += '\n'
+  return html
 }
 
 function processElement (item, html, doc) {
+  console.log(item)
   if ('textRun' in item) {
-    processText(item.textRun, html, doc)
+    html = processText(item.textRun, html, doc)
   }
+  return html
 }
 
 function processText (textRun, html, doc) {
   var text = textRun.content
+  html += '\t'
   // Assuming that a whole para fully italic is a quote
   html += '<span style="'
 
   if ('backgroundColor' in textRun.textStyle) {
-    var redBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.red) * 255).toString(16)
-    var greenBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.green) * 255).toString(16)
-    var blueBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.blue) * 255).toString(16)
-    html += 'background-color:' + '#' + redBg + greenBg + blueBg + ';'
+    var bColour = {
+      red: '00',
+      blue: '00',
+      green: '00'
+    }
+    if ('red' in textRun.textStyle.backgroundColor.color.rgbColor) {
+      var redBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.red) * 255).toString(16)
+      bColour.red = redBg
+    }
+    if ('green' in textRun.textStyle.backgroundColor.color.rgbColor) {
+      var greenBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.green) * 255).toString(16)
+      bColour.green = greenBg
+    }
+    if ('blue' in textRun.textStyle.backgroundColor.color.rgbColor) {
+      var blueBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.blue) * 255).toString(16)
+      bColour.blue = blueBg
+    }
+    html += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + ';'
   }
 
   if ('foregroundColor' in textRun.textStyle) {
-    var redFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.red) * 255).toString(16)
-    var greenFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.green) * 255).toString(16)
-    var blueFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.blue) * 255).toString(16)
-    html += 'color:' + '#' + redFg + greenFg + blueFg + ';'
+    var fColour = {
+      red: '00',
+      blue: '00',
+      green: '00'
+    }
+    if ('red' in textRun.textStyle.foregroundColor.color.rgbColor) {
+      var redFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.red) * 255).toString(16)
+      fColour.red = redFg
+    }
+    if ('green' in textRun.textStyle.foregroundColor.color.rgbColor) {
+      var greenFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.green) * 255).toString(16)
+      fColour.green = greenFg
+    }
+    if ('blue' in textRun.textStyle.foregroundColor.color.rgbColor) {
+      var blueFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.blue) * 255).toString(16)
+      fColour.blue = blueFg
+    }
+    html += 'color:' + '#' + fColour.red + fColour.green + fColour.blue + ';'
   }
 
   if ('fontSize' in textRun.textStyle) {
@@ -299,6 +226,8 @@ function processText (textRun, html, doc) {
   }
 
   html += '</span>'
+  html += '\n'
+  return html
 }
 
 function processImage (item, images, output, doc) {
