@@ -5,7 +5,7 @@
 */
 // holds the really ugly import string for google fonts
 const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Lato&family=Montserrat&family=Open+Sans&family=Poppins&family=Roboto&display=swap');\n</style>"
-
+const styleString = "<link rel=\"stylesheet\" href=\"styles.css\">"
 function docToHTML (doc) {
   // main string that stores HTML (yes this is a little janky)
   html = ''
@@ -16,8 +16,6 @@ function docToHTML (doc) {
   html += '>\n'
   // import fonts and start of body tag
   html += fontString
-
-  console.log(makeCssClasses(html, doc));
 
   // parse the body, adding html elements
   html = parseBody(html, doc.body)
@@ -59,7 +57,8 @@ function parseBody (html, body) {
 }
 
 
-function makeCssClasses(cssFile, doc){
+function makeCssClasses(doc){
+  cssOutput = ""
   namedStylesList = doc.namedStyles.styles;
   for(var i = 0; i < namedStylesList.length; i++){
     className = "." + namedStylesList[i].namedStyleType;
@@ -79,16 +78,73 @@ function makeCssClasses(cssFile, doc){
       text_decoration = "text-decoration: none;";
     }
 
+    backgroundColor = "";
+    if ('backgroundColor' in textInfo) {
+      var bColour = {
+        red: '00',
+        blue: '00',
+        green: '00',
+        transp: '00'
+      }
+      if (textInfo?.backgroundColor?.color?.rgbColor?.red) {
+        var redBg = (parseInt(textInfo.backgroundColor.color.rgbColor.red) * 255).toString(16)
+        bColour.red = redBg
+      }
+      if (textInfo?.backgroundColor?.color?.rgbColor?.green) {
+        var greenBg = (parseInt(textInfo.backgroundColor.color.rgbColor.green) * 255).toString(16)
+        bColour.green = greenBg
+      }
+      if (textInfo?.backgroundColor?.color?.rgbColor?.blue) {
+        var blueBg = (parseInt(textInfo.backgroundColor.color.rgbColor.blue) * 255).toString(16)
+        bColour.blue = blueBg
+      }
+      if(bColour.red != '00' | bColour.blue != '00' | bColour.green != '00'){
+        transp == "ff";
+      }
+      backgroundColor += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + bColour.transp + ';'
+    }
+    
+    color = "";
+    if ('foregroundColor' in textInfo) {
+      var fColour = {
+        red: '00',
+        blue: '00',
+        green: '00'
+      }
+      if (textInfo?.foregroundColor?.color?.rgbColor?.red) {
+        var redFg = (parseInt(textInfo.foregroundColor.color.rgbColor.red) * 255).toString(16);
+        fColour.red = redFg;
+      }
+      if (textInfo?.foregroundColor?.color?.rgbColor?.green) {
+        var greenFg = (parseInt(textInfo.foregroundColor.color.rgbColor.green) * 255).toString(16);
+        fColour.green = greenFg;
+      }
+      if (textInfo?.foregroundColor?.color?.rgbColor?.blue) {
+        var blueFg = (parseInt(textInfo.foregroundColor.color.rgbColor.blue) * 255).toString(16);
+        fColour.blue = blueFg;
+      }
+      color += 'color:' + '#' + fColour.red + fColour.green + fColour.blue + ';'
+    }
 
-    cssOutput = className + "{"
+    font_family = "";
+    if(textInfo?.weightedFontFamily?.fontFamily){
+      font_family = "font-family: " + textInfo?.weightedFontFamily?.fontFamily + ";";
+    }
+
+    font_size = "";
+    if(textInfo?.weightedFontFamily?.weight){
+      font_size = "font-weight: " + textInfo?.weightedFontFamily?.weight + ";";
+    }
+
+    attributes = [bold, italics, text_decoration, backgroundColor, color, font_size, font_family];
+    cssOutput += className + "{\n"
     for(var j = 0; j < attributes.length; j++){
       if(attributes[j] != ""){
         cssOutput += attributes[j] + "\n";
       }
     }
-    cssOutput += "}";
+    cssOutput += "}\n";
   }
-
   return cssOutput;
 }
 
@@ -100,7 +156,11 @@ const rawdata = fs.readFileSync('testDoc.json')
 const doc = JSON.parse(rawdata)
 fs.writeFile('test.html', docToHTML(doc), function (err) {
   if (err) throw err
-  console.log('Updated!')
+  console.log('HTML Updated!')
+})
+fs.writeFile('styles.css', makeCssClasses(doc), function (err) {
+  if (err) throw err
+  console.log('CSS Updated!')
 })
 
 // ConvertGoogleDocToCleanHtml(doc);
