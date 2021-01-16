@@ -16,10 +16,10 @@ function docToHTML(doc) {
 
 
 function addBackgroundColor(html, doc){
-  red_bg = parseInt(doc.documentStyle.background.color.color.rgbColor.red) * 255;
-  green_bg = parseInt(doc.documentStyle.background.color.color.rgbColor.green) * 255;
-  blue_bg = parseInt(doc.documentStyle.background.color.color.rgbColor.blue) * 255;
-  html += "style=\"background-color:\"" + "#" + red_bg + green_bg + blue_bg + "\"";
+  red_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.red) * 255).toString(16);
+  green_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.green) * 255).toString(16);
+  blue_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.blue) * 255).toString(16);
+  html += "style=\"background-color:" + "#" + red_bg + green_bg + blue_bg + "\"";
   return (html)
 }
 
