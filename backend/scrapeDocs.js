@@ -33,16 +33,16 @@ function addPageFormatting(html, doc) {
       green: '00',
     }
 
-    if (doc.documentStyle.background?.color?.rgbColor?.red) {
-      var redBg = (parseInt(textInfo.backgroundColor.color.rgbColor.red) * 255).toString(16)
+    if (doc.documentStyle.background?.color?.color?.rgbColor?.red) {
+      var redBg = (parseInt(doc.documentStyle.background.color.color.rgbColor.red * 255)).toString(16)
       bColour.red = redBg
     }
-    if (doc.documentStyle.background?.color?.rgbColor?.green) {
-      var greenBg = (parseInt(textInfo.backgroundColor.color.rgbColor.green) * 255).toString(16)
+    if (doc.documentStyle.background?.color?.color?.rgbColor?.green) {
+      var greenBg = (parseInt(doc.documentStyle.background.color.color.rgbColor.green * 255)).toString(16)
       bColour.green = greenBg
     }
-    if (doc.documentStyle.background?.color?.rgbColor?.blue) {
-      var blueBg = (parseInt(textInfo.backgroundColor.color.rgbColor.blue) * 255).toString(16)
+    if (doc.documentStyle.background?.color?.color?.rgbColor?.blue) {
+      var blueBg = (parseInt(doc.documentStyle.background.color.color.rgbColor.blue * 255)).toString(16)
       bColour.blue = blueBg
     }
     html += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + ';'
@@ -52,11 +52,14 @@ function addPageFormatting(html, doc) {
   var marginBottom = 1.33 * doc.documentStyle.marginBottom.magnitude
   var marginLeft = 1.33 * doc.documentStyle.marginLeft.magnitude
   var marginRight = 1.33 * doc.documentStyle.marginRight.magnitude
+  var marginHeader = 1.33 * doc.documentStyle.marginHeader.magnitude
+  var pageHeight = 1.33 * doc.documentStyle.pageSize.height.magnitude
 
-  html += 'margin-top:' + marginTop + 'px;'
+  html += 'margin-top:' + marginHeader + 'px;'
   html += 'margin-bottom:' + marginBottom + 'px;'
   html += 'margin-left:' + marginLeft + 'px;'
   html += 'margin-right:' + marginRight + 'px;'
+  html += 'height:' + pageHeight + 'px;'
   html += '"'
 
   return (html)
@@ -116,15 +119,15 @@ function makeCssClasses(doc){
         green: '00',
       }
       if (textInfo?.backgroundColor?.color?.rgbColor?.red) {
-        var redBg = (parseInt(textInfo.backgroundColor.color.rgbColor.red) * 255).toString(16)
+        var redBg = (parseInt(textInfo.backgroundColor.color.rgbColor.red * 255)).toString(16)
         bColour.red = redBg
       }
       if (textInfo?.backgroundColor?.color?.rgbColor?.green) {
-        var greenBg = (parseInt(textInfo.backgroundColor.color.rgbColor.green) * 255).toString(16)
+        var greenBg = (parseInt(textInfo.backgroundColor.color.rgbColor.green * 255)).toString(16)
         bColour.green = greenBg
       }
       if (textInfo?.backgroundColor?.color?.rgbColor?.blue) {
-        var blueBg = (parseInt(textInfo.backgroundColor.color.rgbColor.blue) * 255).toString(16)
+        var blueBg = (parseInt(textInfo.backgroundColor.color.rgbColor.blue * 255)).toString(16)
         bColour.blue = blueBg
       }
       backgroundColor += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + ';'
@@ -138,15 +141,15 @@ function makeCssClasses(doc){
         green: '00'
       }
       if (textInfo?.foregroundColor?.color?.rgbColor?.red) {
-        var redFg = (parseInt(textInfo.foregroundColor.color.rgbColor.red) * 255).toString(16);
+        var redFg = (parseInt(textInfo.foregroundColor.color.rgbColor.red * 255)).toString(16);
         fColour.red = redFg;
       }
       if (textInfo?.foregroundColor?.color?.rgbColor?.green) {
-        var greenFg = (parseInt(textInfo.foregroundColor.color.rgbColor.green) * 255).toString(16);
+        var greenFg = (parseInt(textInfo.foregroundColor.color.rgbColor.green * 255)).toString(16);
         fColour.green = greenFg;
       }
       if (textInfo?.foregroundColor?.color?.rgbColor?.blue) {
-        var blueFg = (parseInt(textInfo.foregroundColor.color.rgbColor.blue) * 255).toString(16);
+        var blueFg = (parseInt(textInfo.foregroundColor.color.rgbColor.blue * 255)).toString(16);
         fColour.blue = blueFg;
       }
       color += 'color:' + '#' + fColour.red + fColour.green + fColour.blue + ';'
@@ -247,7 +250,7 @@ function processParagraph (item, html, doc) {
 function processElement (item, html, doc) {
   if ('textRun' in item) {
     if (item.textRun.content === '\n') {
-      html += '<p></p>'
+      html += '<br>'
     }
     html = processText(item.textRun, html, doc)
   }
@@ -270,15 +273,15 @@ function processText (textRun, html, doc) {
       green: '00'
     }
     if ('red' in textRun.textStyle.backgroundColor.color?.rgbColor) {
-      var redBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.red) * 255).toString(16)
+      var redBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.red * 255)).toString(16)
       bColour.red = redBg
     }
     if ('green' in textRun.textStyle.backgroundColor.color?.rgbColor) {
-      var greenBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.green) * 255).toString(16)
+      var greenBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.green * 255)).toString(16)
       bColour.green = greenBg
     }
     if ('blue' in textRun.textStyle.backgroundColor.color?.rgbColor) {
-      var blueBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.blue) * 255).toString(16)
+      var blueBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.blue * 255)).toString(16)
       bColour.blue = blueBg
     }
     html += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + ';'
@@ -291,15 +294,15 @@ function processText (textRun, html, doc) {
       green: '00'
     }
     if ('red' in textRun.textStyle.foregroundColor.color.rgbColor) {
-      var redFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.red) * 255).toString(16)
+      var redFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.red * 255)).toString(16)
       fColour.red = redFg
     }
     if ('green' in textRun.textStyle.foregroundColor.color.rgbColor) {
-      var greenFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.green) * 255).toString(16)
+      var greenFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.green * 255)).toString(16)
       fColour.green = greenFg
     }
     if ('blue' in textRun.textStyle.foregroundColor.color.rgbColor) {
-      var blueFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.blue) * 255).toString(16)
+      var blueFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.blue * 255)).toString(16)
       fColour.blue = blueFg
     }
     html += 'color:' + '#' + fColour.red + fColour.green + fColour.blue + ';'
@@ -307,12 +310,13 @@ function processText (textRun, html, doc) {
 
   if ('fontSize' in textRun.textStyle) {
     var fontSize = 1.33 * textRun.textStyle.fontSize.magnitude
-    html += 'font-size:' + fontSize + ';'
+    html += 'font-size:' + fontSize + 'px;'
   }
 
   if ('weightedFontFamily' in textRun.textStyle) {
+    console.log(textRun.textStyle.weightedFontFamily.weight)
     html += 'font-family:' + textRun.textStyle.weightedFontFamily.fontFamily + ';'
-    html += 'font-weight:' + textRun.textStyle.weightedFontFamily.fontWeight + ';'
+    html += 'font-weight:' + textRun.textStyle.weightedFontFamily.weight.toString() + ';'
   }
 
   html += '">'
@@ -331,7 +335,7 @@ function processText (textRun, html, doc) {
   }
   if ('link' in textRun.textStyle) {
     // add handling for bookmarkId or heading Id
-    html += '<a href="' + textRun.link.url + '" rel="nofollow">'
+    html += '<a href="' + textRun.textStyle.link.url + '" rel="nofollow">'
   }
 
   html += text
