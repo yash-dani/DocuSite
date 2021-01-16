@@ -84,26 +84,7 @@ function makeCssClasses(cssFile, doc){
       text_decoration = "text-decoration: none;";
     }
 
-    backgroundColorInfo = textInfo?.backgroundColor?.color?.rgbColor;
-    backgroundColor = "";
-    if(textInfo?.backgroundColor?.color?.rgbColor?.red != undefined){
-      red_bg = (parseInt(backgroundColorInfo.red) * 255).toString(16);
-      green_bg = (parseInt(backgroundColorInfo.green) * 255).toString(16);
-      blue_bg = (parseInt(backgroundColorInfo.blue) * 255).toString(16);
-      backgroundColor = "background-color: #" + red_bg + green_bg + blue_bg  + ";";
-    }
 
-    foregroundColorInfo = textInfo?.foregroundColor?.color?.rgbColor;
-    foregroundColor = "";
-    if(textInfo?.foregroundColor?.color?.rgbColor?.red != undefined ){
-      red_bg = (parseInt(foregroundColorInfo.red) * 255).toString(16);
-    }
-    if(textInfo?.fontSize?.magnitude){}
-    fontSize = "font-size: " + textInfo.fontSize.magnitude + textInfo.fontSize.unit + ";";
-
-    fontFamily = "font-family: " + textInfo.weightedFontFamily.fontFamily + ";";
-
-    attributes = [bold, italics, text_decoration, backgroundColor, foregroundColor, fontSize, fontFamily];
     cssOutput = className + "{"
     for(var j = 0; j < attributes.length; j++){
       if(attributes[j] != ""){
