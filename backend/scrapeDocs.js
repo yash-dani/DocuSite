@@ -4,7 +4,7 @@
 *   OUTPUT: HTML string
 */
 // holds the really ugly import string for google fonts
-const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Lato&family=Montserrat&family=Open+Sans&family=Poppins&family=Roboto&display=swap');\n    </style>";
+const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Lato&family=Montserrat&family=Open+Sans&family=Poppins&family=Roboto&display=swap');\n    </style>"
 
 function docToHTML (doc) {
   // main string that stores HTML (yes this is a little janky)
@@ -13,14 +13,14 @@ function docToHTML (doc) {
   html = parseTitle(html, doc.title)
   html += '\n<body '
   html = addBackgroundColor(html, doc)
-  html += '>\n' 
+  html += '>\n'
   // import fonts and start of body tag
-  html += fontString;
+  html += fontString
 
   // parse the body, adding html elements
-  html = parseBody(html, doc.body);
+  html = parseBody(html, doc.body)
   // add last body tag
-  html += "\n</body>"
+  html += '\n</body>'
   return html
 }
 
@@ -35,38 +35,33 @@ function addBackgroundColor (html, doc) {
 // Secondary Script: Create <head> tag using Google Doc
 // INPUT: html string, document object title
 // OUTPUT: updated html string
-function parseTitle(html, title) {
-    headTag = "<!DOCTYPE html>\n<head>\n    <title>" + title + "</title>\n</head>";
-    return headTag;
+function parseTitle (html, title) {
+  headTag = '<!DOCTYPE html>\n<head>\n    <title>' + title + '</title>\n</head>'
+  return headTag
 }
 
 // Secondary Script: Create <body> tag using Google Doc
 // INPUT: html string, document object body
 // OUTPUT: updated html string
 // NOTE: only capable of parsing text at this point. Completely freezes if an image is at play.
-function parseBody(html, body) {
-    // loop through each element in the content
-    for (i = 0; i < body.content.length; i++) {
-        // skip object describing section (for now)
-        if (!('startIndex' in body.content[i])) {
-            continue;
-        }
-        paragraph = body.content[i].paragraph;
-        for (j = 0; j < paragraph.elements.length; j++) {
-            console.log(paragraph.elements[j]);
-            //text = paragraph.elements[j].textRun.content;
-            //console.log(text);
-        }
-
+function parseBody (html, body) {
+  // loop through each element in the content
+  for (i = 0; i < body.content.length; i++) {
+    // skip object describing section (for now)
+    if (!('startIndex' in body.content[i])) {
+      continue
     }
-    return html
+    paragraph = body.content[i].paragraph
+    for (j = 0; j < paragraph.elements.length; j++) {
+      console.log(paragraph.elements[j])
+      // text = paragraph.elements[j].textRun.content;
+      // console.log(text);
+    }
+  }
+  return html
 }
 
-
-
 // IGNORE THE REST OF THIS CODE (IT'S JUST A TEST BENCH + OTHER REFERENCES)
-
-
 
 // Dummy/test setup (opening a test file and running the function on it)
 const fs = require('fs')
@@ -241,32 +236,6 @@ function processText (item, output, doc) {
 function processImage (item, images, output, doc) {
   var id = item.inlineObjectElement.inlineObjectId
   var uri = doc.inlineObjects[id].inlineObjectProperties.embeddedObject.imageProperties.contentUri
-  var width = doc.inlineObjects[id].inlineObjectProperties.embeddedObject.size.height
-  var height = doc.inlineObjects[id].inlineObjectProperties.embeddedObject.size.width
-  // need to convert from PT to PX
-  output.push('<img src=' + uri + 'alt' + id + 'width=' + width + 'height=' + height)
 
-  // images = images || []
-  // var blob = item.getBlob()
-  // var contentType = blob.getContentType()
-  // var extension = ''
-  // if (/\/png$/.test(contentType)) {
-  //   extension = '.png'
-  // } else if (/\/gif$/.test(contentType)) {
-  //   extension = '.gif'
-  // } else if (/\/jpe?g$/.test(contentType)) {
-  //   extension = '.jpg'
-  // } else {
-  //   throw 'Unsupported image type: ' + contentType
-  // }
-  // var imagePrefix = 'Image_'
-  // var imageCounter = images.length
-  // var name = imagePrefix + imageCounter + extension
-  // imageCounter++
-  // output.push('<img src="cid:' + name + '" />')
-  // images.push({
-  //   blob: blob,
-  //   type: contentType,
-  //   name: name
-  // })
+  output.push('<img src=' + uri + 'alt' + id + 'id=' + id)
 }
