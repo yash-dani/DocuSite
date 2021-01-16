@@ -18,10 +18,27 @@ app.listen(port, function () {
   console.log(`running on localhost: ${port}`)
 })
 
+const baseURL = 'https://docs.googleapis.com/v1/documents/'
+
 app.get('/convert/:docId', function (req, res) {
-  res.send(convertDocToHTML(req.params.docId))
+  getDocAsJson(baseURL, req.params.docId)
+    .then(function (data) {
+      res.send(convertDocToHTML(data))
+    })
 })
 
-function convertDocToHTML (docId) {
+const getDocAsJson = async (baseURL, docId) => {
+  // note: authorization scope must be added to the request
+  const res = await fetch(baseURL + docId)
+  try {
+    const data = await res.json()
+    return data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+function convertDocToHTML (data) {
   // convert doc to html and return it
+  
 };
