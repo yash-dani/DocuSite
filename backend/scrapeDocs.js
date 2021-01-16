@@ -8,8 +8,21 @@ function docToHTML(doc) {
     html = '';
     // create title for webpage and HTML <head> tag
     html = parseTitle(html, doc.title);
-    return html
+    html += "\n<body ";
+    html = addBackgroundColor(html, doc);
+    html += ">\n</body>";
+    return html;
 }
+
+
+function addBackgroundColor(html, doc){
+  red_bg = parseInt(doc.documentStyle.background.color.color.rgbColor.red) * 255;
+  green_bg = parseInt(doc.documentStyle.background.color.color.rgbColor.green) * 255;
+  blue_bg = parseInt(doc.documentStyle.background.color.color.rgbColor.blue) * 255;
+  html += "style=\"background-color:\"" + "#" + red_bg + green_bg + blue_bg + "\"";
+  return (html)
+}
+
 
 // Secondary Script: Create <head> tag using Google Doc
 // INPUT: html string, document object title
@@ -30,9 +43,7 @@ fs.writeFile('test.html', docToHTML(doc), function (err) {
     console.log('Updated!');
   });
 console.log(doc.body);
-//ConvertGoogleDocToCleanHtml(doc);
-
-
+// ConvertGoogleDocToCleanHtml(doc);
 
 
 // RANDOM GITHUB SCRIPT TESTING
@@ -53,31 +64,6 @@ function ConvertGoogleDocToCleanHtml(doc) {
     //emailHtml(html, images);
     console.log(html);
     //createDocumentForHtml(html, images);
-  }
-  
-  function emailHtml(html, images) {
-    var attachments = [];
-    for (var j=0; j<images.length; j++) {
-      attachments.push( {
-        "fileName": images[j].name,
-        "mimeType": images[j].type,
-        "content": images[j].blob.getBytes() } );
-    }
-  
-    var inlineImages = {};
-    for (var j=0; j<images.length; j++) {
-      inlineImages[[images[j].name]] = images[j].blob;
-    }
-  
-    var name = DocumentApp.getActiveDocument().getName()+".html";
-    attachments.push({"fileName":name, "mimeType": "text/html", "content": html});
-    MailApp.sendEmail({
-       to: Session.getActiveUser().getEmail(),
-       subject: name,
-       htmlBody: html,
-       inlineImages: inlineImages,
-       attachments: attachments
-     });
   }
   
   function createDocumentForHtml(html, images) {
