@@ -18,7 +18,7 @@ function docToHTML (doc) {
   html += fontString
 
   // parse the body, adding html elements
-  html = parseBody(html, doc.body)
+  html = parseBody(html, doc)
   // add last body tag
   html += '</body>'
   return html
@@ -74,14 +74,14 @@ function parseTitle (html, title) {
 // INPUT: html string, document object body
 // OUTPUT: updated html string
 // NOTE: only capable of parsing text at this point. Completely freezes if an image is at play.
-function parseBody (html, body) {
+function parseBody (html, doc) {
   // loop through each element in the content
-  for (var i = 0; i < body.content.length; i++) {
+  for (var i = 0; i < doc.body.content.length; i++) {
     // skip object describing section (for now)
-    if (!('startIndex' in body.content[i])) {
+    if (!('startIndex' in doc.body.content[i])) {
       continue
     }
-    html = processParagraph(body.content[i], html, body)
+    html = processParagraph(doc.body.content[i], html, doc)
   }
   return html
 }
@@ -251,6 +251,9 @@ function processElement (item, html, doc) {
     }
     html = processText(item.textRun, html, doc)
   }
+  if ('inlineObjectElement' in item) {
+    html = processImage(item.inlineObjectElement, html, doc)
+  }
   return html
 }
 
@@ -355,8 +358,8 @@ function processText (textRun, html, doc) {
 }
 
 function processImage (item, images, output, doc) {
-  var id = item.inlineObjectElement.inlineObjectId
+  var id = item.inlineObjectId
   var uri = doc.inlineObjects[id].inlineObjectProperties.embeddedObject.imageProperties.contentUri
 
-  output.push('<img src=' + uri + 'alt' + id + 'id=' + id)
+  html += '<img src=' + uri + 'alt' + id + 'id=' + id + '>'
 }
