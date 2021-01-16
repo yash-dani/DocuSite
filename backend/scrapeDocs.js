@@ -17,6 +17,8 @@ function docToHTML (doc) {
   // import fonts and start of body tag
   html += fontString
 
+  console.log(makeCssClasses(html, doc));
+
   // parse the body, adding html elements
   html = parseBody(html, doc.body)
   // add last body tag
@@ -59,6 +61,59 @@ function parseBody (html, body) {
     }
   }
   return html
+}
+
+
+function makeCssClasses(cssFile, doc){
+  namedStylesList = doc.namedStyles.styles;
+  for(var i = 0; i < namedStylesList.length; i++){
+    className = "." + namedStylesList[i].namedStyleType;
+    textInfo = namedStylesList[i].textStyle;
+    bold = textInfo.bold ? "font-weight: bold;" : "font-weight: normal;";
+    italics = textInfo.italics ? "font-style: italic\;" : "font-style: normal;";
+    if(textInfo.underline & textInfo.strikethrough){
+      text_decoration = "text-decoration: underline line-through;";
+    }
+    else if(textInfo.underline){
+      text_decoration = "text-decoration: underline;";
+    }
+    else if(textInfo.strikethrough){
+      text_decoration = "text-decoration: strikethrough;";
+    }
+    else{
+      text_decoration = "text-decoration: none;";
+    }
+
+    backgroundColorInfo = textInfo?.backgroundColor?.color?.rgbColor;
+    backgroundColor = "";
+    if(textInfo?.backgroundColor?.color?.rgbColor?.red != undefined){
+      red_bg = (parseInt(backgroundColorInfo.red) * 255).toString(16);
+      green_bg = (parseInt(backgroundColorInfo.green) * 255).toString(16);
+      blue_bg = (parseInt(backgroundColorInfo.blue) * 255).toString(16);
+      backgroundColor = "background-color: #" + red_bg + green_bg + blue_bg  + ";";
+    }
+
+    foregroundColorInfo = textInfo?.foregroundColor?.color?.rgbColor;
+    foregroundColor = "";
+    if(textInfo?.foregroundColor?.color?.rgbColor?.red != undefined ){
+      red_bg = (parseInt(foregroundColorInfo.red) * 255).toString(16);
+    }
+    if(textInfo?.fontSize?.magnitude){}
+    fontSize = "font-size: " + textInfo.fontSize.magnitude + textInfo.fontSize.unit + ";";
+
+    fontFamily = "font-family: " + textInfo.weightedFontFamily.fontFamily + ";";
+
+    attributes = [bold, italics, text_decoration, backgroundColor, foregroundColor, fontSize, fontFamily];
+    cssOutput = className + "{"
+    for(var j = 0; j < attributes.length; j++){
+      if(attributes[j] != ""){
+        cssOutput += attributes[j] + "\n";
+      }
+    }
+    cssOutput += "}";
+  }
+
+  return cssOutput;
 }
 
 // IGNORE THE REST OF THIS CODE (IT'S JUST A TEST BENCH + OTHER REFERENCES)
