@@ -8,7 +8,18 @@ function docToHTML (doc) {
   html = ''
   // create title for webpage and HTML <head> tag
   html = parseTitle(html, doc.title)
+  html += '\n<body '
+  html = addBackgroundColor(html, doc)
+  html += '>\n</body>'
   return html
+}
+
+function addBackgroundColor (html, doc) {
+  red_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.red) * 255).toString(16)
+  green_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.green) * 255).toString(16)
+  blue_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.blue) * 255).toString(16)
+  html += 'style="background-color:' + '#' + red_bg + green_bg + blue_bg + '"'
+  return (html)
 }
 
 // Secondary Script: Create <head> tag using Google Doc
@@ -61,21 +72,6 @@ function emailHtml (html, images) {
       content: images[j].blob.getBytes()
     })
   }
-
-  var inlineImages = {}
-  for (var j = 0; j < images.length; j++) {
-    inlineImages[[images[j].name]] = images[j].blob
-  }
-
-  var name = DocumentApp.getActiveDocument().getName() + '.html'
-  attachments.push({ fileName: name, mimeType: 'text/html', content: html })
-  MailApp.sendEmail({
-    to: Session.getActiveUser().getEmail(),
-    subject: name,
-    htmlBody: html,
-    inlineImages: inlineImages,
-    attachments: attachments
-  })
 }
 
 function createDocumentForHtml (html, images) {
@@ -84,13 +80,6 @@ function createDocumentForHtml (html, images) {
   newDoc.getBody().setText(html)
   for (var j = 0; j < images.length; j++) { newDoc.getBody().appendImage(images[j].blob) }
   newDoc.saveAndClose()
-}
-
-function dumpAttributes (atts) {
-  // Log the paragraph attributes.
-  for (var att in atts) {
-    Logger.log(att + ':' + atts[att])
-  }
 }
 
 function processItem (item, listCounters, images) {
