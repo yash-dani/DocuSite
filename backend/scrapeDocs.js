@@ -54,7 +54,7 @@ function ConvertGoogleDocToCleanHtml (doc) {
   // Walk through all the child elements of the body.
   for (var i = 0; i < numChildren; i++) {
     var child = body.content[i]
-    output.push(processItem(child, listCounters, images))
+    output.push(processItem(child, listCounters, images, doc))
   }
 
   var html = output.join('\r')
@@ -82,7 +82,7 @@ function createDocumentForHtml (html, images) {
   newDoc.saveAndClose()
 }
 
-function processItem (item, listCounters, images) {
+function processItem (item, listCounters, images, doc) {
   var output = []
   var prefix = ''; var suffix = ''
 
@@ -120,7 +120,7 @@ function processItem (item, listCounters, images) {
 
     if (item.elements.length === 0) { return '' }
   } else if ('inlineObjectElement' in item) {
-    processImage(item, images, output)
+    processImage(item, images, output, doc)
   }
   // else if ('bullet' in item) {
   //   var listItem = item
@@ -164,7 +164,7 @@ function processItem (item, listCounters, images) {
   output.push(prefix)
 
   if ('textRun' in item) {
-    processText(item, output)
+    processText(item, output, doc)
   } else {
     if ('elements' in item) {
       var numChildren = item.elements.length
@@ -181,90 +181,54 @@ function processItem (item, listCounters, images) {
   return output.join('')
 }
 
-function processText (item, output) {
-  var text = item.getText()
-  var indices = item.getTextAttributeIndices()
+function processText (item, output, doc) {
+  var text = item.content
 
-  if (indices.length <= 1) {
-    // Assuming that a whole para fully italic is a quote
-    if (item.isBold()) {
-      output.push('<strong>' + text + '</strong>')
-    } else if (item.isItalic()) {
-      output.push('<blockquote>' + text + '</blockquote>')
-    } else if (text.trim().indexOf('http://') == 0) {
-      output.push('<a href="' + text + '" rel="nofollow">' + text + '</a>')
-    } else if (text.trim().indexOf('https://') == 0) {
-      output.push('<a href="' + text + '" rel="nofollow">' + text + '</a>')
-    } else {
-      output.push(text)
-    }
+  // Assuming that a whole para fully italic is a quote
+  if (item.textStyle.bold) {
+    output.push('<strong>' + text + '</strong>')
+  } else if (item.textStyle.italic) {
+    output.push('<blockquote>' + text + '</blockquote>')
+  } else if (item.textStyle.UNDERLINE) {
+    output.push('<u>' + text + '</u>')
+  } else if (text.trim().indexOf('http://') === 0) {
+    output.push('<a href="' + text + '" rel="nofollow">' + text + '</a>')
+  } else if (text.trim().indexOf('https://') === 0) {
+    output.push('<a href="' + text + '" rel="nofollow">' + text + '</a>')
   } else {
-    for (var i = 0; i < indices.length; i++) {
-      var partAtts = item.getAttributes(indices[i])
-      var startPos = indices[i]
-      var endPos = i + 1 < indices.length ? indices[i + 1] : text.length
-      var partText = text.substring(startPos, endPos)
-
-      Logger.log(partText)
-
-      if (partAtts.ITALIC) {
-        output.push('<i>')
-      }
-      if (partAtts.BOLD) {
-        output.push('<strong>')
-      }
-      if (partAtts.UNDERLINE) {
-        output.push('<u>')
-      }
-
-      // If someone has written [xxx] and made this whole text some special font, like superscript
-      // then treat it as a reference and make it superscript.
-      // Unfortunately in Google Docs, there's no way to detect superscript
-      if (partText.indexOf('[') == 0 && partText[partText.length - 1] == ']') {
-        output.push('<sup>' + partText + '</sup>')
-      } else if (partText.trim().indexOf('http://') == 0) {
-        output.push('<a href="' + partText + '" rel="nofollow">' + partText + '</a>')
-      } else if (partText.trim().indexOf('https://') == 0) {
-        output.push('<a href="' + partText + '" rel="nofollow">' + partText + '</a>')
-      } else {
-        output.push(partText)
-      }
-
-      if (partAtts.ITALIC) {
-        output.push('</i>')
-      }
-      if (partAtts.BOLD) {
-        output.push('</strong>')
-      }
-      if (partAtts.UNDERLINE) {
-        output.push('</u>')
-      }
-    }
+    output.push(text)
   }
 }
 
-function processImage (item, images, output) {
-  images = images || []
-  var blob = item.getBlob()
-  var contentType = blob.getContentType()
-  var extension = ''
-  if (/\/png$/.test(contentType)) {
-    extension = '.png'
-  } else if (/\/gif$/.test(contentType)) {
-    extension = '.gif'
-  } else if (/\/jpe?g$/.test(contentType)) {
-    extension = '.jpg'
-  } else {
-    throw 'Unsupported image type: ' + contentType
-  }
-  var imagePrefix = 'Image_'
-  var imageCounter = images.length
-  var name = imagePrefix + imageCounter + extension
-  imageCounter++
-  output.push('<img src="cid:' + name + '" />')
-  images.push({
-    blob: blob,
-    type: contentType,
-    name: name
-  })
+function processImage (item, images, output, doc) {
+  var id = item.inlineObjectElement.inlineObjectId
+  var uri = doc.inlineObjects[id].inlineObjectProperties.embeddedObject.imageProperties.contentUri
+  var width = doc.inlineObjects[id].inlineObjectProperties.embeddedObject.size.height
+  var height = doc.inlineObjects[id].inlineObjectProperties.embeddedObject.size.width
+  // need to convert from PT to PX
+  output.push('<img src=' + uri + 'alt' + id + 'width=' + width + 'height=' + height)
+
+  // images = images || []
+  // var blob = item.getBlob()
+  // var contentType = blob.getContentType()
+  // var extension = ''
+  // if (/\/png$/.test(contentType)) {
+  //   extension = '.png'
+  // } else if (/\/gif$/.test(contentType)) {
+  //   extension = '.gif'
+  // } else if (/\/jpe?g$/.test(contentType)) {
+  //   extension = '.jpg'
+  // } else {
+  //   throw 'Unsupported image type: ' + contentType
+  // }
+  // var imagePrefix = 'Image_'
+  // var imageCounter = images.length
+  // var name = imagePrefix + imageCounter + extension
+  // imageCounter++
+  // output.push('<img src="cid:' + name + '" />')
+  // images.push({
+  //   blob: blob,
+  //   type: contentType,
+  //   name: name
+  // })
 }
