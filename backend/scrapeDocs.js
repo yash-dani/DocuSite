@@ -25,6 +25,7 @@ function docToHTML (doc) {
 }
 
 function addBackgroundColor (html, doc) {
+  console.log(doc)
   red_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.red) * 255).toString(16)
   green_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.green) * 255).toString(16)
   blue_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.blue) * 255).toString(16)
@@ -84,7 +85,6 @@ function makeCssClasses(doc){
         red: '00',
         blue: '00',
         green: '00',
-        transp: '00'
       }
       if (textInfo?.backgroundColor?.color?.rgbColor?.red) {
         var redBg = (parseInt(textInfo.backgroundColor.color.rgbColor.red) * 255).toString(16)
@@ -98,10 +98,7 @@ function makeCssClasses(doc){
         var blueBg = (parseInt(textInfo.backgroundColor.color.rgbColor.blue) * 255).toString(16)
         bColour.blue = blueBg
       }
-      if(bColour.red != '00' | bColour.blue != '00' | bColour.green != '00'){
-        transp == "ff";
-      }
-      backgroundColor += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + bColour.transp + ';'
+      backgroundColor += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + ';'
     }
     
     color = "";
@@ -240,15 +237,15 @@ function processText (textRun, html, doc) {
       blue: '00',
       green: '00'
     }
-    if ('red' in textRun.textStyle.backgroundColor.color.rgbColor) {
+    if ('red' in textRun.textStyle.backgroundColor.color?.rgbColor) {
       var redBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.red) * 255).toString(16)
       bColour.red = redBg
     }
-    if ('green' in textRun.textStyle.backgroundColor.color.rgbColor) {
+    if ('green' in textRun.textStyle.backgroundColor.color?.rgbColor) {
       var greenBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.green) * 255).toString(16)
       bColour.green = greenBg
     }
-    if ('blue' in textRun.textStyle.backgroundColor.color.rgbColor) {
+    if ('blue' in textRun.textStyle.backgroundColor.color?.rgbColor) {
       var blueBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.blue) * 255).toString(16)
       bColour.blue = blueBg
     }
