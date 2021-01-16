@@ -123,8 +123,10 @@ function processParagraph (item, html, doc) {
 }
 
 function processElement (item, html, doc) {
-  console.log(item)
   if ('textRun' in item) {
+    if (item.textRun.content === '\n') {
+      html += '<p></p>'
+    }
     html = processText(item.textRun, html, doc)
   }
   return html
