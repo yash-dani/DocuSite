@@ -3,6 +3,9 @@
 *   INPUT: doc object from docs API
 *   OUTPUT: HTML string
 */
+// holds the really ugly import string for google fonts
+const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Lato&family=Montserrat&family=Open+Sans&family=Poppins&family=Roboto&display=swap');\n    </style>";
+
 function docToHTML (doc) {
   // main string that stores HTML (yes this is a little janky)
   html = ''
@@ -10,7 +13,14 @@ function docToHTML (doc) {
   html = parseTitle(html, doc.title)
   html += '\n<body '
   html = addBackgroundColor(html, doc)
-  html += '>\n</body>'
+  html += '>\n' 
+  // import fonts and start of body tag
+  html += fontString;
+
+  // parse the body, adding html elements
+  html = parseBody(html, doc.body);
+  // add last body tag
+  html += "\n</body>"
   return html
 }
 
@@ -24,15 +34,42 @@ function addBackgroundColor (html, doc) {
 
 // Secondary Script: Create <head> tag using Google Doc
 // INPUT: html string, document object title
-// OUTPUT: same html string
-function parseTitle (html, title) {
-  headTag = '<!DOCTYPE html>\n<head>\n    <title>' + title + '</title>\n</head>'
-  return headTag
+// OUTPUT: updated html string
+function parseTitle(html, title) {
+    headTag = "<!DOCTYPE html>\n<head>\n    <title>" + title + "</title>\n</head>";
+    return headTag;
 }
+
+// Secondary Script: Create <body> tag using Google Doc
+// INPUT: html string, document object body
+// OUTPUT: updated html string
+// NOTE: only capable of parsing text at this point. Completely freezes if an image is at play.
+function parseBody(html, body) {
+    // loop through each element in the content
+    for (i = 0; i < body.content.length; i++) {
+        // skip object describing section (for now)
+        if (!('startIndex' in body.content[i])) {
+            continue;
+        }
+        paragraph = body.content[i].paragraph;
+        for (j = 0; j < paragraph.elements.length; j++) {
+            console.log(paragraph.elements[j]);
+            //text = paragraph.elements[j].textRun.content;
+            //console.log(text);
+        }
+
+    }
+    return html
+}
+
+
+
+// IGNORE THE REST OF THIS CODE (IT'S JUST A TEST BENCH + OTHER REFERENCES)
+
+
 
 // Dummy/test setup (opening a test file and running the function on it)
 const fs = require('fs')
-
 const rawdata = fs.readFileSync('testDoc.json')
 const doc = JSON.parse(rawdata)
 console.log(docToHTML(doc))
@@ -41,6 +78,7 @@ fs.writeFile('test.html', docToHTML(doc), function (err) {
   console.log('Updated!')
 })
 console.log(doc.body)
+
 // ConvertGoogleDocToCleanHtml(doc);
 
 // RANDOM GITHUB SCRIPT TESTING
