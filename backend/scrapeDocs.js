@@ -12,7 +12,7 @@ function docToHTML (doc) {
   // create title for webpage and HTML <head> tag
   html = parseTitle(html, doc.title)
   html += '\n<body '
-  // html = addBackgroundColor(html, doc)
+  html = addPageFormatting(html, doc)
   html += '>\n'
   // import fonts and start of body tag
   html += fontString
@@ -24,12 +24,41 @@ function docToHTML (doc) {
   return html
 }
 
-function addBackgroundColor (html, doc) {
-  console.log(doc)
-  red_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.red) * 255).toString(16)
-  green_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.green) * 255).toString(16)
-  blue_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.blue) * 255).toString(16)
-  html += 'style="background-color:' + '#' + red_bg + green_bg + blue_bg + '"'
+function addPageFormatting(html, doc) {
+  html += 'style="'
+  if (doc.documentStyle.background.color.color?.rgbColor) {
+    var bColour = {
+      red: '00',
+      blue: '00',
+      green: '00',
+    }
+
+    if (doc.documentStyle.background?.color?.rgbColor?.red) {
+      var redBg = (parseInt(textInfo.backgroundColor.color.rgbColor.red) * 255).toString(16)
+      bColour.red = redBg
+    }
+    if (doc.documentStyle.background?.color?.rgbColor?.green) {
+      var greenBg = (parseInt(textInfo.backgroundColor.color.rgbColor.green) * 255).toString(16)
+      bColour.green = greenBg
+    }
+    if (doc.documentStyle.background?.color?.rgbColor?.blue) {
+      var blueBg = (parseInt(textInfo.backgroundColor.color.rgbColor.blue) * 255).toString(16)
+      bColour.blue = blueBg
+    }
+    html += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + ';'
+  }
+  
+  var marginTop = 1.33 * doc.documentStyle.marginTop.magnitude
+  var marginBottom = 1.33 * doc.documentStyle.marginBottom.magnitude
+  var marginLeft = 1.33 * doc.documentStyle.marginLeft.magnitude
+  var marginRight = 1.33 * doc.documentStyle.marginRight.magnitude
+
+  html += 'margin-top:' + marginTop + 'px;'
+  html += 'margin-bottom:' + marginBottom + 'px;'
+  html += 'margin-left:' + marginLeft + 'px;'
+  html += 'margin-right:' + marginRight + 'px;'
+  html += '"'
+
   return (html)
 }
 
