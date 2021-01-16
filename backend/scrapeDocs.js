@@ -214,23 +214,91 @@ function processItem (item, listCounters, images, doc) {
   return output.join('')
 }
 
-function processText (item, output, doc) {
-  var text = item.content
+function processParagraph (item, html, doc) {
+  html += '<div class=' + item.paragraph.paragraphStyles.namedStyleType + '>'
 
-  // Assuming that a whole para fully italic is a quote
-  if (item.textStyle.bold) {
-    output.push('<strong>' + text + '</strong>')
-  } else if (item.textStyle.italic) {
-    output.push('<blockquote>' + text + '</blockquote>')
-  } else if (item.textStyle.UNDERLINE) {
-    output.push('<u>' + text + '</u>')
-  } else if (text.trim().indexOf('http://') === 0) {
-    output.push('<a href="' + text + '" rel="nofollow">' + text + '</a>')
-  } else if (text.trim().indexOf('https://') === 0) {
-    output.push('<a href="' + text + '" rel="nofollow">' + text + '</a>')
-  } else {
-    output.push(text)
+  var numElements = item.elements.length
+
+  for (var i; i < numElements; i++) {
+    processElement(item[i])
   }
+
+  html += '</div>'
+}
+
+function processElement (item, html, doc) {
+  if ('textRun' in item) {
+    processText(item.textRun, html, doc)
+  }
+}
+
+function processText (textRun, html, doc) {
+  var text = textRun.content
+  // Assuming that a whole para fully italic is a quote
+  html += '<span style="'
+
+  if ('backgroundColor' in textRun.textStyle) {
+    var redBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.red) * 255).toString(16)
+    var greenBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.green) * 255).toString(16)
+    var blueBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.blue) * 255).toString(16)
+    html += 'background-color:' + '#' + redBg + greenBg + blueBg + ';'
+  }
+
+  if ('foregroundColor' in textRun.textStyle) {
+    var redFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.red) * 255).toString(16)
+    var greenFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.green) * 255).toString(16)
+    var blueFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.blue) * 255).toString(16)
+    html += 'color:' + '#' + redFg + greenFg + blueFg + ';'
+  }
+
+  if ('fontSize' in textRun.textStyle) {
+    var fontSize = 1.33 * textRun.textStyle.fontSize.magnitude
+    html += 'font-size:' + fontSize + ';'
+  }
+
+  if ('weightedFontFamily' in textRun.textStyle) {
+    html += 'font-family:' + textRun.textStyle.weightedFontFamily.fontFamily + ';'
+    html += 'font-weight:' + textRun.textStyle.weightedFontFamily.fontWeight + ';'
+  }
+
+  html += '">'
+
+  if (textRun.textStyle.bold) {
+    html += '<strong>'
+  }
+  if (textRun.textStyle.italic) {
+    html += '<i>'
+  }
+  if (textRun.textStyle.underline) {
+    html += '<u>'
+  }
+  if (textRun.textStyle.strikethrough) {
+    html += '<s>'
+  }
+  if ('link' in textRun.textStyle) {
+    // add handling for bookmarkId or heading Id
+    html += '<a href="' + textRun.link.url + '" rel="nofollow">'
+  }
+
+  html += text
+
+  if ('link' in textRun.textStyle) {
+    html += '</a>'
+  }
+  if (textRun.textStyle.strikethrough) {
+    html += '</s>'
+  }
+  if (textRun.textStyle.underline) {
+    html += '</u>'
+  }
+  if (textRun.textStyle.italic) {
+    html += '</i>'
+  }
+  if (textRun.textStyle.bold) {
+    html += '</strong>'
+  }
+
+  html += '</span>'
 }
 
 function processImage (item, images, output, doc) {
