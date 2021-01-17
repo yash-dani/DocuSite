@@ -4,7 +4,7 @@
 *   OUTPUT: HTML string
 */
 // holds the really ugly import string for google fonts
-const fontString = "<style>\n      @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville&family=Lora&family=Source+Sans+Pro&display=swap%27);\n</style>"
+const fontString = "<style>\n      @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville&family=Lora&family=Source+Sans+Pro&display=swap%27');\n</style>"
 const styleString = "<link rel=\"stylesheet\" href=\"styles.css\">"
 var inForm = false;
 var inBullet = false
