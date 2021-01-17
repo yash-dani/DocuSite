@@ -10,13 +10,17 @@ function Convert() {
         setLoading(true);
         evt.preventDefault();
         // alert(`Submitted Link Is: ${link}`);
-        const endpoint = "http://localhost:3001/convert/" + document.getElementById('fieldInput').value;
+        console.log(link);
+        const endpoint = "http://localhost:3001/convertAuth/" + link;
         //const params = {body: {"link" : document.getElementById('fieldInput').value}};
         console.log(endpoint)
         axios.get(endpoint).then(data => {
             setLoading(false)
-            console.log(data);
-            //window.open(data.link)
+            //console.log(data);
+            //console.log(data.data);
+            var dt = new Date();
+              while ((new Date()) - dt <= 15000) { /* Do nothing */ }
+            window.open(data.data);
         }).catch(err =>{
             setLoading(false)
             alert('Oh no! this link isn\'t valid');
