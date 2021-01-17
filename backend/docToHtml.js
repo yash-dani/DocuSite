@@ -11,7 +11,7 @@ app.use(cors())
 /* Initializing the main project folder, point to folder with frontend files */
 app.use(express.static('example'))
 
-const port = 3000
+const port = 3001
 // Spin up the server
 app.listen(port, function () {
   console.log('server running')
@@ -21,10 +21,11 @@ app.listen(port, function () {
 const baseURL = 'https://docs.googleapis.com/v1/documents/'
 
 app.get('/convert/:docId', function (req, res) {
-  getDocAsJson(baseURL, req.params.docId)
-    .then(function (data) {
-      res.send(convertDocToHTML(data))
-    })
+  // getDocAsJson(baseURL, req.params.docId)
+  //   .then(function (data) {
+  //     res.send(convertDocToHTML(data))
+  //   })
+  res.send('lol');
 })
 
 const getDocAsJson = async (baseURL, docId) => {
