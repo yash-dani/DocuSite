@@ -2,6 +2,7 @@
 const express = require('express')
 const fetch = require('node-fetch')
 const { google } = require('googleapis')
+const docs = google.docs('v1')
 
 // Start up an instance of app
 const app = express()
@@ -20,7 +21,7 @@ app.listen(port, function () {
   console.log(`running on localhost: ${port}`)
 })
 
-const baseURL = 'https://docs.googleapis.com/v1/documents/'
+var docUrl = ''
 
 const oauth2Client = new google.auth.OAuth2(
   '1051440759200-r2ldquvemlrea60lqrejgf000cg25duo.apps.googleusercontent.com',
@@ -28,49 +29,28 @@ const oauth2Client = new google.auth.OAuth2(
   'http://localhost:3001/oauth2callback'
 )
 
+google.options({ auth: oauth2Client })
+
 const scopes = [
   'https://www.googleapis.com/auth/documents'
 ]
 
-async function authenticate (scopes) {
-  return new Promise((resolve, reject) => {
-    const authorizeUrl = oauth2Client.generateAuthUrl({
-      access_type: 'offline',
-      scope: scopes
-    })
-    const server = http
-      .createServer(async (req, res) => {
-        try {
-          if (req.url.indexOf('/oauth2callback') > -1) {
-            const qs = new url.URL(req.url, 'http://localhost:3000')
-              .searchParams
-            res.end('Authentication successful! Please return to the console.')
-            server.destroy()
-            const { tokens } = await oauth2Client.getToken(qs.get('code'))
-            oauth2Client.credentials = tokens // eslint-disable-line require-atomic-updates
-            resolve(oauth2Client)
-          }
-        } catch (e) {
-          reject(e)
-        }
-      })
-      .listen(3000, () => {
-        // open the browser to the authorize url to start the workflow
-        opn(authorizeUrl, { wait: false }).then(cp => cp.unref())
-      })
-    destroyer(server)
+app.get('/convert/:docUrl', function (req, res) {
+  docUrl = req.params.docUrl
+  console.log(docUrl)
+  const authorizeUrl = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: scopes
   })
-}
-const url = oauth2Client.generateAuthUrl({
-  scope: scopes
+  res.redirect(authorizeUrl)
 })
 
-app.get('/convert/:docId', function (req, res) {
-  // getDocAsJson(baseURL, req.params.docId)
-  //   .then(function (data) {
-  //     res.send(convertDocToHTML(data))
-  //   })
-  res.send('lol');
+app.get('/oauth2callback', async (req, res) => {
+  console.log('hi')
+  const { tokens } = await oauth2Client.getToken(req.query.code)
+  oauth2Client.setCredentials(tokens)
+  const response = await docs.documents.get({ documentId: docUrl })
+  console.log(response.data)
 })
 
 const getDocAsJson = async (baseURL, docId) => {
