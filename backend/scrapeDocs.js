@@ -275,12 +275,12 @@ function processElement (item, html, doc) {
     else if(inForm && inBullet){
       var str = item.textRun.content
       html+='<input type="radio" id="'+str+'" name="poggers">'
-      html+='<label for="'+str'">'+str+'</label><br>'
+      html+='<label for="'+str+'">'+str+'</label><br>'
     }
     else if(inForm && textInput.test(item.textRun.content)){
       var str = item.textRun.content
       var res = str.split(":");
-      val n = res[0]
+      var n = res[0]
       html += '<label for="'+n+'">'+n+'</label>'
       html += '<input id="'+n+'" name="'+n+'">'
     }
