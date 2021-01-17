@@ -119,6 +119,7 @@ function makeCssClasses(doc){
         red: '00',
         blue: '00',
         green: '00',
+        transp: '00'
       }
       if (textInfo?.backgroundColor?.color?.rgbColor?.red) {
         var redBg = (parseInt(textInfo.backgroundColor.color.rgbColor.red * 255)).toString(16)
@@ -132,7 +133,10 @@ function makeCssClasses(doc){
         var blueBg = (parseInt(textInfo.backgroundColor.color.rgbColor.blue * 255)).toString(16)
         bColour.blue = blueBg
       }
-      backgroundColor += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + ';'
+      if(bColour.red != '00' || bColour.blue != '00' | bColour.green != '00' ){
+        bColour.transp = 'ff';
+      }
+      backgroundColor += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + bColour.transp + ';'
     }
     
     color = "";
