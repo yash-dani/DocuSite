@@ -6,6 +6,8 @@
 // holds the really ugly import string for google fonts
 const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:ital,wght@0,100;0,200;1,100;1,200&family=Open+Sans&display=swap');\n</style>"
 const styleString = "<link rel=\"stylesheet\" href=\"styles.css\">"
+var inForm = false;
+var inBullet = false
 function docToHTML (doc) {
   // main string that stores HTML (yes this is a little janky)
   html = ''
@@ -234,6 +236,15 @@ fs.writeFile('styles.css', makeCssClasses(doc), function (err) {
 // }
 
 function processParagraph (item, html, doc) {
+
+  
+  if(item.paragraph.bullet){
+    inBullet = true
+  }
+  else{
+    inBullet = false
+  }
+
   html += '\n'
   html += '<div class=' + item.paragraph.paragraphStyle.namedStyleType + '>'
   html += '\n'
@@ -249,7 +260,37 @@ function processParagraph (item, html, doc) {
 
 function processElement (item, html, doc) {
   if ('textRun' in item) {
-    if (item.textRun.content === '\n') {
+
+    var textInput = new RegExp("\([a-zA-Z])+:_+");
+    // process as a form tag
+    if(item.textRun.content==="\u003cform\n" && !inForm){
+      html+='<form>'
+      inForm=true
+    }
+    //end form tag
+    else if(item.textRun.content==="\u003e\n" && inForm){
+      html+='</form>'
+      inForm=false
+    }
+    else if(inForm && inBullet){
+      var str = item.textRun.content
+      html+='<input type="radio" id="'+str+'" name="poggers">'
+      html+='<label for="'+str'">'+str+'</label><br>'
+    }
+    else if(inForm && textInput.test(item.textRun.content)){
+      var str = item.textRun.content
+      var res = str.split(":");
+      val n = res[0]
+      html += '<label for="'+n+'">'+n+'</label>'
+      html += '<input id="'+n+'" name="'+n+'">'
+    }
+    else if(inForm && item.textRun.content.toLowerCase()==="submit\n"){
+      html += '<input type="submit" value="Submit">'
+    }
+    
+
+
+    else if (item.textRun.content === '\n') {
       html += '<br>'
     }
     html = processText(item.textRun, html, doc)
