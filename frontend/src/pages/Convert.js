@@ -10,10 +10,12 @@ function Convert() {
         setLoading(true);
         evt.preventDefault();
         alert(`Submitted Link Is: ${link}`);
-        const endpoint = "http://localhost:3001/docToHtml";
-        const params = {body: {"link" : document.getElementById('fieldInput').value}};
-        axios.get(endpoint, params).then(data => {
-            window.open(data.link)
+        const endpoint = "http://localhost:3001/convert/" + document.getElementById('fieldInput').value;
+        //const params = {body: {"link" : document.getElementById('fieldInput').value}};
+        console.log(endpoint)
+        axios.get(endpoint).then(data => {
+            console.log(data);
+            //window.open(data.link)
         }).catch(err =>{
             alert('Oh no! this link isn\'t valid');
             console.log(err);
