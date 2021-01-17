@@ -477,7 +477,7 @@ function processImage (item, html, doc) {
 
   var marginTop = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.marginTop.magnitude
   var marginBottom = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.marginBottom.magnitude
-  var marginLeft = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.marginLeft.magnitude
+  // var marginLeft = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.marginLeft.magnitude
   var marginRight = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.marginRight.magnitude
   var height = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.size.height.magnitude
   var width = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.size.width.magnitude
@@ -488,7 +488,7 @@ function processImage (item, html, doc) {
   html += ' style="'
   html += 'margin-top:' + marginTop + 'px;'
   html += 'margin-bottom:' + marginBottom + 'px;'
-  html += 'margin-left:' + marginLeft + 'px;'
+  // html += 'margin-left:' + marginLeft + 'px;'
   html += 'margin-right:' + marginRight + 'px;'
   html += '">'
   return html
