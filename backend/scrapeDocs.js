@@ -4,7 +4,7 @@
 *   OUTPUT: HTML string
 */
 // holds the really ugly import string for google fonts
-const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:ital,wght@0,100;0,200;1,100;1,200&family=Open+Sans&display=swap');\n</style>"
+const fontString = "<style>\n      @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville&family=Lora&family=Source+Sans+Pro&display=swap%27');\n</style>"
 const styleString = "<link rel=\"stylesheet\" href=\"styles.css\">"
 var inForm = false;
 var inBullet = false
@@ -25,6 +25,9 @@ function docToHTML (doc) {
   // parse the body, adding html elements
   html = parseBody(html, doc)
   // add last body tag
+  if ('defaultFooterId' in doc.documentStyle) {
+    html = parseFooter(html, doc)
+  }
   html += '</body>'
   return html
 }
@@ -58,13 +61,24 @@ function addPageFormatting(html, doc) {
   var marginLeft = 1.33 * doc.documentStyle.marginLeft.magnitude
   var marginRight = 1.33 * doc.documentStyle.marginRight.magnitude
   var marginHeader = 1.33 * doc.documentStyle.marginHeader.magnitude
-  var pageHeight = 1.33 * doc.documentStyle.pageSize.height.magnitude
+  var marginFooter = 1.33 * doc.documentStyle.marginFooter.magnitude
+  // var pageHeight = 1.33 * doc.documentStyle.pageSize.height.magnitude
 
-  html += 'margin-top:' + marginTop + 'px;'
-  html += 'margin-bottom:' + marginBottom + 'px;'
+  if ('marginHeader' in doc.documentStyle) {
+    html += 'margin-top:' + marginHeader + 'px;'
+  } else if ('marginTop' in doc.documentStyle) {
+    html += 'margin-top:' + marginTop + 'px; '
+  }
+
+  if ('marginFooter' in doc.documentStyle) {
+    html += 'margin-bottom:' + marginFooter + 'px;'
+  } else if ('marginBottom' in doc.documentStyle) {
+    html += 'margin-bottom:' + marginBottom + 'px;'
+  }
+
   html += 'margin-left:' + marginLeft + 'px;'
   html += 'margin-right:' + marginRight + 'px;'
-  html += 'height:' + pageHeight + 'px;'
+  // html += 'height:' + pageHeight + 'px;'
   html += '"'
 
   return (html)
@@ -102,6 +116,13 @@ function parseBody (html, doc) {
   return html
 }
 
+function parseFooter (html, doc) {
+  var footerId = doc.documentStyle.defaultFooterId
+  for (var i = 0; i < doc.footers[footerId].content.length; i++) {
+    html = processParagraph(doc.footers[footerId].content[i], html, doc)
+  }
+  return html
+}
 
 function makeCssClasses(doc){
   cssOutput = ""
@@ -206,7 +227,11 @@ function processParagraph (item, html, doc) {
   }
 
   html += '\n'
-  html += '<div class=' + item?.paragraph?.paragraphStyle?.namedStyleType + '>'
+  html += '<div class=' + item.paragraph.paragraphStyle.namedStyleType + ' '
+  if (item.paragraph.paragraphStyle.alignment === 'CENTER') {
+    html += 'style="text-align:center"'
+  } 
+  html += '>'
   html += '\n'
   var numElements = item.paragraph.elements.length
   for (var i = 0; i < numElements; i++) {
@@ -392,8 +417,16 @@ const rawdata = fs.readFileSync('testDoc.json')
 const doc = JSON.parse(rawdata)
 
 function test() {
-  return '';
+  fs.writeFileSync('test.html', docToHTML(doc), function (err) {
+    if (err) throw err
+    console.log('HTML Updated!')
+  })
+  fs.writeFileSync('styles.css', makeCssClasses(doc), function (err) {
+    if (err) throw err
+    console.log('CSS Updated!')
+  })
 }
+// test()
 
 function deploySite(obj) {
   var shell = require('shelljs');
