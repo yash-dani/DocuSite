@@ -4,7 +4,7 @@
 *   OUTPUT: HTML string
 */
 // holds the really ugly import string for google fonts
-const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Lato&family=Montserrat&family=Open+Sans&family=Poppins&family=Roboto&display=swap');\n</style>"
+const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:ital,wght@0,100;0,200;1,100;1,200&family=Open+Sans&display=swap');\n</style>"
 const styleString = "<link rel=\"stylesheet\" href=\"styles.css\">"
 var inForm = false;
 var inBullet = false
@@ -275,12 +275,12 @@ function processElement (item, html, doc) {
     else if(inForm && inBullet){
       var str = item.textRun.content
       html+='<input type="radio" id="'+str+'" name="poggers">'
-      html+='<label for="'+str'">'+str+'</label><br>'
+      html+='<label for="'+str+'">'+str+'</label><br>'
     }
     else if(inForm && textInput.test(item.textRun.content)){
       var str = item.textRun.content
       var res = str.split(":");
-      val n = res[0]
+      var n = res[0]
       html += '<label for="'+n+'">'+n+'</label>'
       html += '<input id="'+n+'" name="'+n+'">'
     }
@@ -354,7 +354,6 @@ function processText (textRun, html, doc) {
   }
 
   if ('weightedFontFamily' in textRun.textStyle) {
-    console.log(textRun.textStyle.weightedFontFamily.weight)
     html += 'font-family:' + textRun.textStyle.weightedFontFamily.fontFamily + ';'
     html += 'font-weight:' + textRun.textStyle.weightedFontFamily.weight.toString() + ';'
   }
@@ -375,7 +374,7 @@ function processText (textRun, html, doc) {
   }
   if ('link' in textRun.textStyle) {
     // add handling for bookmarkId or heading Id
-    html += '<a href="' + textRun.textStyle.link.url + '" rel="nofollow">'
+    html += '<a href="' + textRun.textStyle.link.url + '" rel="nofollow" style="color: inherit;text-decoration:inherit">'
   }
 
   html += text
@@ -401,9 +400,25 @@ function processText (textRun, html, doc) {
   return html
 }
 
-function processImage (item, images, output, doc) {
+function processImage (item, html, doc) {
   var id = item.inlineObjectId
   var uri = doc.inlineObjects[id].inlineObjectProperties.embeddedObject.imageProperties.contentUri
 
-  html += '<img src=' + uri + 'alt' + id + 'id=' + id + '>'
+  var marginTop = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.marginTop.magnitude
+  var marginBottom = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.marginBottom.magnitude
+  var marginLeft = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.marginLeft.magnitude
+  var marginRight = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.marginRight.magnitude
+  var height = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.size.height.magnitude
+  var width = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.size.width.magnitude
+
+  html += '<img src="' + uri + '" alt="' + id + '" id="' + id + '"'
+  html += 'height="' + height.toString() + '"'
+  html += ' width=' + width.toString() + '"'
+  html += ' style="'
+  html += 'margin-top:' + marginTop + 'px;'
+  html += 'margin-bottom:' + marginBottom + 'px;'
+  html += 'margin-left:' + marginLeft + 'px;'
+  html += 'margin-right:' + marginRight + 'px;'
+  html += '">'
+  return html
 }
