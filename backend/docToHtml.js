@@ -71,7 +71,7 @@ const getDocAsJson = async (baseURL, docId) => {
     console.log(docId)
     const res = await fetch(baseURL + docId, {
       headers: {
-        Authorization: 'Bearer ya29.a0AfH6SMCNTPnyNFwTLgRhVm2PLYmhOAF0C83eJwsjGt_IqOtBZTaphkiIdn35cZhpIuF0KOxqw9Es-5D8Q6x-OikHY-p5vVTGni9gEZtAWTUKGnggA02fVN50SfGGFlUFI-sL1H769jlYjejEVXmD6a6-Dj2K6zQZFW_V-DmXM'
+        Authorization: 'Bearer'
       }
     })
     const data = await res.json()
