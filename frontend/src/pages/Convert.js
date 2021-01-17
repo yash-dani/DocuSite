@@ -9,14 +9,16 @@ function Convert() {
     const handleSubmit = (evt) => {
         setLoading(true);
         evt.preventDefault();
-        alert(`Submitted Link Is: ${link}`);
+        // alert(`Submitted Link Is: ${link}`);
         const endpoint = "http://localhost:3001/convert/" + document.getElementById('fieldInput').value;
         //const params = {body: {"link" : document.getElementById('fieldInput').value}};
         console.log(endpoint)
         axios.get(endpoint).then(data => {
+            setLoading(false)
             console.log(data);
             //window.open(data.link)
         }).catch(err =>{
+            setLoading(false)
             alert('Oh no! this link isn\'t valid');
             console.log(err);
         });
@@ -34,7 +36,7 @@ function Convert() {
             <div className="col-lg-1 align-middle">
               
             </div>
-            <div className="col-lg-10" style={{height:"100vh",verticalAlign: "middle",textAlign:"Center",padding:"20vh 5vw 0px 5vw"}}>
+            <div className="col-lg-10" style={{height:"0vh",verticalAlign: "middle",textAlign:"Center",padding:"0vh 5vw 0px 5vw"}}>
             <h1 style={{fontSize:45,fontWeight:700}}>Doc-2-HTML.</h1>
             <p>
                 <br/>
@@ -50,9 +52,21 @@ function Convert() {
             <br/>
             {
                 loading!=null && loading?(
+                <div>
+                {/* <div className="progress" style={{margin:"0px 200px"}}>
+                    <div className="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style={{width: "100%"}}></div>
+                </div>
+                <br/> */}
+                <img src="https://media.giphy.com/media/VjAB0fOmK15Ze/source.gif" style={{width:"30%",boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}  />
+                <br/>
+                <br/>
                 <div className="progress" style={{margin:"0px 200px"}}>
                     <div className="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style={{width: "100%"}}></div>
-                </div>):null
+                </div>
+                </div>
+                )
+                :
+                null
             }
             </div>
             <div className="col-lg-1 align-middle">

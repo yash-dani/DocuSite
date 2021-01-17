@@ -6,8 +6,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* background-color: #fff9d9; */
+  margin-top: 10vh;
   background: url("https://demo.codefest.co.uk/blimey/assets/images/bg.png") no-repeat;
-  background-size: cover;
+  /* background-size: cover; */
 	/* background-image: linear-gradient(#f2f7fa, #fbfefe); */
 }
 

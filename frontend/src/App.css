@@ -13,6 +13,14 @@
   }
 }
 
+.route-wrapper {
+  position: relative;
+}
+
+.route-wrapper > div {
+  position: absolute;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
