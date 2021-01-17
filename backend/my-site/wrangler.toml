@@ -1,6 +1,6 @@
 name = "my-site"
 type = "webpack"
-account_id = "018e9f9c5262ae76206a3e034d7c5d23"
+account_id = "9495b129dda9946fc002a024f077a376"
 workers_dev = true
 route = ""
 zone_id = ""

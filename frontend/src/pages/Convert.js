@@ -10,8 +10,9 @@ function Convert() {
         setLoading(true);
         evt.preventDefault();
         // alert(`Submitted Link Is: ${link}`);
+        var parsedID = link.split('/')[5];
         console.log(link);
-        const endpoint = "http://localhost:3001/convertAuth/" + link;
+        const endpoint = "http://localhost:3001/convertAuth/" + parsedID;
         //const params = {body: {"link" : document.getElementById('fieldInput').value}};
         console.log(endpoint)
         axios.get(endpoint).then(data => {

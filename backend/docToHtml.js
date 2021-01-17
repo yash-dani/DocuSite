@@ -56,7 +56,8 @@ app.get('/oauth2callback', async (req, res) => {
 const baseURL = 'https://docs.googleapis.com/v1/documents/'
 
 app.get('/convertAuth/:docUrl', async (req, res) => {
-  docUrl = req.params.docUrl.split('/')[5]
+  docUrl = req.params.docUrl;
+  console.log(docUrl);
   const something = await getDocAsJson(baseURL, docUrl)
   console.log(something);
   a = await toHTML.deploySite(something);
@@ -70,7 +71,7 @@ const getDocAsJson = async (baseURL, docId) => {
     console.log(docId)
     const res = await fetch(baseURL + docId, {
       headers: {
-        Authorization: 'Bearer ya29.a0AfH6SMCdGbOyJ42C1Hl4w7WnKbgaeqNLdA7BjDiobWzvnU0onWoy_AsOHf_TtThMGiRJ5vqpdjcjnhECSWY_ek4YpgSIfRir7LD_j9iAMKOtG-Rj2FOw0hz-mIPsaSykatj1P5K2qSLsOtmu1Z1lGGJF0nLqtIH9zVf7gJmPBlQ'
+        Authorization: 'Bearer ya29.a0AfH6SMAQA7835PgCjRD3mmoYy0_Rd0Nip_I343GTvhsBezDgp_urbfhfFHLFnLKtA1UCtE9nZskMFXN97j4IpoOMwFkVfO_rWRIGtvRZCy-vr_MIQCUjy1Q5bFoxdN-_V4lbJ7Z1ojznWuSjzIwxLeXT__8Lgr6O-CJdtbW7KUA'
       }
     })
     const data = await res.json()
