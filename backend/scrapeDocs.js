@@ -17,7 +17,8 @@ function docToHTML (doc) {
   html = addPageFormatting(html, doc)
   html += '>\n'
   // import fonts and start of body tag
-  html += fontString
+  html += fontString;
+  html += styleString;
 
   // parse the body, adding html elements
   html = parseBody(html, doc)
