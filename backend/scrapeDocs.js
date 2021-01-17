@@ -4,8 +4,10 @@
 *   OUTPUT: HTML string
 */
 // holds the really ugly import string for google fonts
-const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Lato&family=Montserrat&family=Open+Sans&family=Poppins&family=Roboto&display=swap');\n</style>"
-
+const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:ital,wght@0,100;0,200;1,100;1,200&family=Open+Sans&display=swap');\n</style>"
+const styleString = "<link rel=\"stylesheet\" href=\"styles.css\">"
+var inForm = false;
+var inBullet = false
 function docToHTML (doc) {
   // main string that stores HTML (yes this is a little janky)
   html = ''
@@ -132,6 +134,8 @@ function parseTextStyle(textInfo){
   }
 
   attributes = [bold, italics, text_decoration, backgroundColor, color, font_size, font_family];
+
+  return attributes;
 }
 
 
@@ -154,29 +158,6 @@ function makeCssClasses(doc){
 
   }
 
-  if("list" in doc){
-    for(var listSectionName in doc.lists){
-      nestingLevels = doc.lists[listSectionName];
-      for(var i = 0; i < nestingLevels.length; i++){
-        cssOutput += listSectionName + toString(i) + "{";
-        levelFormatting = nestingLevels[i];
-        text_align_string = levelFormatting.bulletAlignment;
-        if(text_align_string == "START" | text_align_string == "BULLET_ALIGNMENT_UNSPECIFIED"){
-          "text-align: left;"
-        }
-        else if(text_align_string == "END"){
-          "text-align: right;"
-        }
-        else{
-          "text-align: center;"
-        }
-        
-        padding_left = "padding-left: " + levelFormatting.indentFirstLine.magnitude + levelFormatting.indentFirstLine.unit;
-        text_indent = "text-indent: " + + levelFormatting.indentStart.magnitude + levelFormatting.indentStart.unit;
-      }
-    }
-  }
-
   return cssOutput;
 }
 
@@ -190,7 +171,7 @@ fs.writeFile('test.html', docToHTML(doc), function (err) {
   if (err) throw err
   console.log('Updated!')
 })
-fs.writeFile('style.css', makeCssClasses(doc), function (err) {
+fs.writeFile('styles.css', makeCssClasses(doc), function (err) {
   if (err) throw err
   console.log('Updated!')
 })
@@ -241,8 +222,9 @@ function processParagraph (item, html, doc) {
   html += '<div class=' + item.paragraph.paragraphStyle.namedStyleType + '>'
   html += '\n'
 
-  html = processBullet(item.paragraph.element[i]);
-  
+  if(item?.paragraph?.bullets){
+    html += "<p style=\"display:inline\">•</p>"
+  }
 
   var numElements = item.paragraph.elements.length
   for (var i = 0; i < numElements; i++) {
@@ -256,7 +238,39 @@ function processParagraph (item, html, doc) {
 function processElement (item, html, doc) {
   console.log(item)
   if ('textRun' in item) {
-    html = processText(item.textRun, html, doc)
+
+    var textInput = new RegExp("\([a-zA-Z])+:_+");
+    // process as a form tag
+    if(item.textRun.content==="\u003cform\n" && !inForm){
+      html+='<form><div>'
+      inForm=true
+    }
+    //end form tag
+    else if((item.textRun.content==="\u003e\n" || item.textRun.content==="\u003e") && inForm){
+      html+='</form></div>'
+      inForm=false
+    }
+    else if(inForm && inBullet){
+      var str = item.textRun.content.replace(/^\s+|\s+$/g, '')
+      html+='<input type="radio" id="'+str+'" name="poggers">'
+      html+='<label for="'+str+'">'+str+'</label><br>'
+    }
+    else if(inForm && textInput.test(item.textRun.content)){
+      var str = item.textRun.content.replace(/^\s+|\s+$/g, '')
+      var res = str.split(":");
+      var n = res[0]
+      html += '<label for="'+n+'">'+n+'</label>'
+      html += '<input id="'+n+'" name="'+n+'">'
+    }
+    else if(inForm && item.textRun.content.toLowerCase()==="submit\n"){
+      html += '<input type="submit" value="Submit">'
+    }
+    else if (item.textRun.content === '\n') {
+      html += '<br>'
+    }
+    else{
+      html = processText(item.textRun, html, doc)
+    }
   }
   return html
 }
@@ -335,7 +349,7 @@ function processText (textRun, html, doc) {
   }
   if ('link' in textRun.textStyle) {
     // add handling for bookmarkId or heading Id
-    html += '<a href="' + textRun.link.url + '" rel="nofollow">'
+    html += '<a href="' + textRun.textStyle.link.url + '" rel="nofollow" style="color: inherit;text-decoration:inherit">'
   }
 
   html += text
@@ -361,9 +375,25 @@ function processText (textRun, html, doc) {
   return html
 }
 
-function processImage (item, images, output, doc) {
-  var id = item.inlineObjectElement.inlineObjectId
+function processImage (item, html, doc) {
+  var id = item.inlineObjectId
   var uri = doc.inlineObjects[id].inlineObjectProperties.embeddedObject.imageProperties.contentUri
 
-  output.push('<img src=' + uri + 'alt' + id + 'id=' + id)
+  var marginTop = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.marginTop.magnitude
+  var marginBottom = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.marginBottom.magnitude
+  var marginLeft = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.marginLeft.magnitude
+  var marginRight = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.marginRight.magnitude
+  var height = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.size.height.magnitude
+  var width = 1.33 * doc.inlineObjects[id].inlineObjectProperties.embeddedObject.size.width.magnitude
+
+  html += '<img src="' + uri + '" alt="' + id + '" id="' + id + '"'
+  html += 'height="' + height.toString() + '"'
+  html += ' width=' + width.toString() + '"'
+  html += ' style="'
+  html += 'margin-top:' + marginTop + 'px;'
+  html += 'margin-bottom:' + marginBottom + 'px;'
+  html += 'margin-left:' + marginLeft + 'px;'
+  html += 'margin-right:' + marginRight + 'px;'
+  html += '">'
+  return html
 }
