@@ -1,3 +1,5 @@
 /node_modules
 test.html
-test.json
+testDoc.json
+styles.css
+../frontend/.eslintcache

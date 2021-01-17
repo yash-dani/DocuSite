@@ -66,10 +66,11 @@ const url = oauth2Client.generateAuthUrl({
 })
 
 app.get('/convert/:docId', function (req, res) {
-  getDocAsJson(baseURL, req.params.docId)
-    .then(function (data) {
-      res.send(convertDocToHTML(data))
-    })
+  // getDocAsJson(baseURL, req.params.docId)
+  //   .then(function (data) {
+  //     res.send(convertDocToHTML(data))
+  //   })
+  res.send('lol');
 })
 
 const getDocAsJson = async (baseURL, docId) => {

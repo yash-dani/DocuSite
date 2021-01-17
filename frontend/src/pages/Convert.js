@@ -1,18 +1,30 @@
 import React, { Component, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from 'axios'
 
 function Convert() {
     const [link, setLink] = useState("")
     const [loading, setLoading] = useState(false)
     
     const handleSubmit = (evt) => {
-        setLoading(true)
+        setLoading(true);
         evt.preventDefault();
-        alert(`Submitted Link Is: ${link}`)
-        const timer = setTimeout(() => {
-            setLoading(false)
-            setLink("")
-        }, 3000);
+        alert(`Submitted Link Is: ${link}`);
+        const endpoint = "http://localhost:3001/convert/" + document.getElementById('fieldInput').value;
+        //const params = {body: {"link" : document.getElementById('fieldInput').value}};
+        console.log(endpoint)
+        axios.get(endpoint).then(data => {
+            console.log(data);
+            //window.open(data.link)
+        }).catch(err =>{
+            alert('Oh no! this link isn\'t valid');
+            console.log(err);
+        });
+
+        // const timer = setTimeout(() => {
+        //     setLoading(false)
+        //     setLink("")
+        // }, 3000);
         // return () => clearTimeout(timer);
     }
 
@@ -30,7 +42,7 @@ function Convert() {
             </p>
             <form onSubmit={handleSubmit}>
                 <div class="form-group">
-                <input className="form-control" type="text" value={link}
+                <input className="form-control" type="text" id = "fieldInput" value={link}
                     onChange={e => setLink(e.target.value)} placeholder="Enter Your Google Docs Link Here"/>
                 </div>
                 <button type="submit" class="btn btn-primary">Convert</button>
