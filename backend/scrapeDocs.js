@@ -4,7 +4,7 @@
 *   OUTPUT: HTML string
 */
 // holds the really ugly import string for google fonts
-const fontString = "<style>             @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,600;0,700;0,900;1,300;1,400;1,600;1,700;1,900&display=swap%27');</style>"
+const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:ital,wght@0,100;0,200;1,100;1,200&family=Open+Sans&display=swap');\n</style>"
 const styleString = "<link rel=\"stylesheet\" href=\"styles.css\">"
 var inForm = false;
 var inBullet = false
@@ -18,10 +18,6 @@ function docToHTML (doc) {
   html += '>\n'
   // import fonts and start of body tag
   html += fontString
-  html += styleString;
-  if ('defaultHeaderId' in doc.documentStyle) {
-    html = parseHeader(html, doc)
-  }
 
   // parse the body, adding html elements
   html = parseBody(html, doc)
@@ -60,14 +56,12 @@ function addPageFormatting(html, doc) {
   var marginRight = 1.33 * doc.documentStyle.marginRight.magnitude
   var marginHeader = 1.33 * doc.documentStyle.marginHeader.magnitude
   var pageHeight = 1.33 * doc.documentStyle.pageSize.height.magnitude
-  
 
-  html += 'margin-top:' + marginTop + 'px;'
+  html += 'margin-top:' + marginHeader + 'px;'
   html += 'margin-bottom:' + marginBottom + 'px;'
   html += 'margin-left:' + marginLeft + 'px;'
   html += 'margin-right:' + marginRight + 'px;'
-  // html += 'height:' + pageHeight + 'px;'
-  // html += 'height:100%;'
+  html += 'height:' + pageHeight + 'px;'
   html += '"'
 
   return (html)
@@ -79,14 +73,6 @@ function addPageFormatting(html, doc) {
 function parseTitle (html, title) {
   headTag = '<!DOCTYPE html>\n<head>\n    <title>' + title + '</title>\n</head>'
   return headTag
-}
-
-function parseHeader (html, doc) {
-  var headerId = doc.documentStyle.defaultHeaderId
-  for (var i = 0; i < doc.headers[headerId].content.length; i++) {
-    html = processParagraph(doc.headers[headerId].content[i], html, doc)
-  }
-  return html
 }
 
 // Secondary Script: Create <body> tag using Google Doc
@@ -133,7 +119,6 @@ function makeCssClasses(doc){
         red: '00',
         blue: '00',
         green: '00',
-        transp: '00'
       }
       if (textInfo?.backgroundColor?.color?.rgbColor?.red) {
         var redBg = (parseInt(textInfo.backgroundColor.color.rgbColor.red * 255)).toString(16)
@@ -147,10 +132,7 @@ function makeCssClasses(doc){
         var blueBg = (parseInt(textInfo.backgroundColor.color.rgbColor.blue * 255)).toString(16)
         bColour.blue = blueBg
       }
-      if (bColour.blue != '00' | bColour.red != '00' | bColour.green != '00'){
-        bColour.transp = "ff";
-      }
-      backgroundColor += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + bColour.transp + ';'
+      backgroundColor += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + ';'
     }
     
     color = "";
@@ -281,56 +263,6 @@ function processElement (item, html, doc) {
 
     var textInput = new RegExp("\([a-zA-Z])+:_+");
     // process as a form tag
-    ////////
-    var textRun = item.textRun
-    var bgColor = ""
-    var fgColor = ""
-    
-  if ('backgroundColor' in textRun.textStyle) {
-    var bColour = {
-      red: '00',
-      blue: '00',
-      green: '00'
-    }
-    if ('red' in textRun.textStyle.backgroundColor.color?.rgbColor) {
-      var redBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.red * 255)).toString(16)
-      bColour.red = redBg
-    }
-    if ('green' in textRun.textStyle.backgroundColor.color?.rgbColor) {
-      var greenBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.green * 255)).toString(16)
-      bColour.green = greenBg
-    }
-    if ('blue' in textRun.textStyle.backgroundColor.color?.rgbColor) {
-      var blueBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.blue * 255)).toString(16)
-      bColour.blue = blueBg
-    }
-    bgColor += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + ';'
-  }
-
-  if ('foregroundColor' in textRun.textStyle) {
-    var fColour = {
-      red: '00',
-      blue: '00',
-      green: '00'
-    }
-    if ('red' in textRun.textStyle.foregroundColor.color.rgbColor) {
-      var redFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.red * 255)).toString(16)
-      fColour.red = redFg
-    }
-    if ('green' in textRun.textStyle.foregroundColor.color.rgbColor) {
-      var greenFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.green * 255)).toString(16)
-      fColour.green = greenFg
-    }
-    if ('blue' in textRun.textStyle.foregroundColor.color.rgbColor) {
-      var blueFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.blue * 255)).toString(16)
-      fColour.blue = blueFg
-    }
-    fgColor += 'color:' + '#' + fColour.red + fColour.green + fColour.blue + ';'
-  }
-
-  var style = 'style="'+bgColor+' '+fgColor+'" '
-    ///////
-
     if(item.textRun.content==="\u003cform\n" && !inForm){
       html+='<form><div>'
       inForm=true
@@ -343,13 +275,13 @@ function processElement (item, html, doc) {
     else if(inForm && inBullet){
       var str = item.textRun.content.replace(/^\s+|\s+$/g, '')
       html+='<input type="radio" id="'+str+'" name="poggers">'
-      html+='<label '+style+'for="'+str+'">'+str+'</label><br>'
+      html+='<label for="'+str+'">'+str+'</label><br>'
     }
     else if(inForm && textInput.test(item.textRun.content)){
       var str = item.textRun.content.replace(/^\s+|\s+$/g, '')
       var res = str.split(":");
       var n = res[0]
-      html += '<label '+style+' for="'+n+'">'+n+'</label>'
+      html += '<label for="'+n+'">'+n+'</label>'
       html += '<input id="'+n+'" name="'+n+'">'
     }
     else if(inForm && item.textRun.content.toLowerCase()==="submit\n"){
@@ -359,10 +291,7 @@ function processElement (item, html, doc) {
       html += '<br>'
     }
     else{
-      if(inBullet){
-        html += "<p style=\"display:inline\"> • </p>";
-      }
-      html = processText(item.textRun, html, doc);
+      html = processText(item.textRun, html, doc)
     }
   }
   if ('inlineObjectElement' in item) {
@@ -447,7 +376,7 @@ function processText (textRun, html, doc) {
     // add handling for bookmarkId or heading Id
     html += '<a href="' + textRun.textStyle.link.url + '" rel="nofollow" style="color: inherit;text-decoration:inherit">'
   }
-  text = text.replace(/\s/g, '&nbsp')
+
   html += text
 
   if ('link' in textRun.textStyle) {

@@ -1,0 +1,9 @@
+name = "my-site"
+type = "webpack"
+account_id = "018e9f9c5262ae76206a3e034d7c5d23"
+workers_dev = true
+route = ""
+zone_id = ""
+
+[site]
+bucket = "./public"
