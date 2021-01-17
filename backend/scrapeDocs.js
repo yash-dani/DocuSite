@@ -5,67 +5,32 @@
 */
 // holds the really ugly import string for google fonts
 const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Lato&family=Montserrat&family=Open+Sans&family=Poppins&family=Roboto&display=swap');\n</style>"
-const styleString = "<link rel=\"stylesheet\" href=\"styles.css\">"
-var inForm = false;
-var inBullet = false
+
 function docToHTML (doc) {
   // main string that stores HTML (yes this is a little janky)
   html = ''
   // create title for webpage and HTML <head> tag
   html = parseTitle(html, doc.title)
   html += '\n<body '
-  html = addPageFormatting(html, doc)
+  // html = addBackgroundColor(html, doc)
   html += '>\n'
   // import fonts and start of body tag
   html += fontString
 
   // parse the body, adding html elements
-  html = parseBody(html, doc)
+  html = parseBody(html, doc.body)
   // add last body tag
   html += '</body>'
   return html
 }
 
-function addPageFormatting(html, doc) {
-  html += 'style="'
-  if (doc.documentStyle.background.color.color?.rgbColor) {
-    var bColour = {
-      red: '00',
-      blue: '00',
-      green: '00',
-    }
-
-    if (doc.documentStyle.background?.color?.color?.rgbColor?.red) {
-      var redBg = (parseInt(doc.documentStyle.background.color.color.rgbColor.red * 255)).toString(16)
-      bColour.red = redBg
-    }
-    if (doc.documentStyle.background?.color?.color?.rgbColor?.green) {
-      var greenBg = (parseInt(doc.documentStyle.background.color.color.rgbColor.green * 255)).toString(16)
-      bColour.green = greenBg
-    }
-    if (doc.documentStyle.background?.color?.color?.rgbColor?.blue) {
-      var blueBg = (parseInt(doc.documentStyle.background.color.color.rgbColor.blue * 255)).toString(16)
-      bColour.blue = blueBg
-    }
-    html += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + ';'
-  }
-  
-  var marginTop = 1.33 * doc.documentStyle.marginTop.magnitude
-  var marginBottom = 1.33 * doc.documentStyle.marginBottom.magnitude
-  var marginLeft = 1.33 * doc.documentStyle.marginLeft.magnitude
-  var marginRight = 1.33 * doc.documentStyle.marginRight.magnitude
-  var marginHeader = 1.33 * doc.documentStyle.marginHeader.magnitude
-  var pageHeight = 1.33 * doc.documentStyle.pageSize.height.magnitude
-
-  html += 'margin-top:' + marginHeader + 'px;'
-  html += 'margin-bottom:' + marginBottom + 'px;'
-  html += 'margin-left:' + marginLeft + 'px;'
-  html += 'margin-right:' + marginRight + 'px;'
-  html += 'height:' + pageHeight + 'px;'
-  html += '"'
-
-  return (html)
-}
+// function addBackgroundColor (html, doc) {
+//   red_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.red) * 255).toString(16)
+//   green_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.green) * 255).toString(16)
+//   blue_bg = (parseInt(doc.documentStyle.background.color.color.rgbColor.blue) * 255).toString(16)
+//   html += 'style="background-color:' + '#' + red_bg + green_bg + blue_bg + '"'
+//   return (html)
+// }
 
 // Secondary Script: Create <head> tag using Google Doc
 // INPUT: html string, document object title
@@ -79,95 +44,106 @@ function parseTitle (html, title) {
 // INPUT: html string, document object body
 // OUTPUT: updated html string
 // NOTE: only capable of parsing text at this point. Completely freezes if an image is at play.
-function parseBody (html, doc) {
+function parseBody (html, body) {
   // loop through each element in the content
-  for (var i = 0; i < doc.body.content.length; i++) {
+  for (var i = 0; i < body.content.length; i++) {
     // skip object describing section (for now)
-    if (!('startIndex' in doc.body.content[i])) {
+    if (!('startIndex' in body.content[i])) {
       continue
     }
-    html = processParagraph(doc.body.content[i], html, doc)
+    html = processParagraph(body.content[i], html, body)
   }
   return html
 }
 
 
+function parseTextStyle(textInfo){
+  bold = textInfo.bold ? "font-weight: bold;" : "font-weight: normal;";
+  italics = textInfo.italics ? "font-style: italic\;" : "font-style: normal;";
+  if(textInfo.underline & textInfo.strikethrough){
+    text_decoration = "text-decoration: underline line-through;";
+  }
+  else if(textInfo.underline){
+    text_decoration = "text-decoration: underline;";
+  }
+  else if(textInfo.strikethrough){
+    text_decoration = "text-decoration: strikethrough;";
+  }
+  else{
+    text_decoration = "text-decoration: none;";
+  }
+
+  backgroundColor = "";
+  if ('backgroundColor' in textInfo) {
+    var bColour = {
+      red: '00',
+      blue: '00',
+      green: '00',
+      transp: '00'
+    }
+    if (textInfo?.backgroundColor?.color?.rgbColor?.red) {
+      var redBg = (parseInt(textInfo.backgroundColor.color.rgbColor.red) * 255).toString(16)
+      bColour.red = redBg
+    }
+    if (textInfo?.backgroundColor?.color?.rgbColor?.green) {
+      var greenBg = (parseInt(textInfo.backgroundColor.color.rgbColor.green) * 255).toString(16)
+      bColour.green = greenBg
+    }
+    if (textInfo?.backgroundColor?.color?.rgbColor?.blue) {
+      var blueBg = (parseInt(textInfo.backgroundColor.color.rgbColor.blue) * 255).toString(16)
+      bColour.blue = blueBg
+    }
+    if(bColour.red != '00' | bColour.blue != '00' | bColour.green != '00'){
+      bColour.transp == "ff";
+    }
+    backgroundColor += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + bColour.transp + ';'
+  }
+  
+  color = "";
+  if ('foregroundColor' in textInfo) {
+    var fColour = {
+      red: '00',
+      blue: '00',
+      green: '00'
+    }
+    if (textInfo?.foregroundColor?.color?.rgbColor?.red) {
+      var redFg = (parseInt(textInfo.foregroundColor.color.rgbColor.red) * 255).toString(16);
+      fColour.red = redFg;
+    }
+    if (textInfo?.foregroundColor?.color?.rgbColor?.green) {
+      var greenFg = (parseInt(textInfo.foregroundColor.color.rgbColor.green) * 255).toString(16);
+      fColour.green = greenFg;
+    }
+    if (textInfo?.foregroundColor?.color?.rgbColor?.blue) {
+      var blueFg = (parseInt(textInfo.foregroundColor.color.rgbColor.blue) * 255).toString(16);
+      fColour.blue = blueFg;
+    }
+    color += 'color:' + '#' + fColour.red + fColour.green + fColour.blue + ';'
+  }
+
+  font_family = "";
+  if(textInfo?.weightedFontFamily?.fontFamily){
+    font_family = "font-family: " + textInfo?.weightedFontFamily?.fontFamily + ";";
+  }
+
+  font_size = "";
+  if(textInfo?.weightedFontFamily?.weight){
+    font_size = "font-weight: " + textInfo?.weightedFontFamily?.weight + ";";
+  }
+
+  attributes = [bold, italics, text_decoration, backgroundColor, color, font_size, font_family];
+}
+
+
 function makeCssClasses(doc){
+
+  // for all text
+
   cssOutput = ""
   namedStylesList = doc.namedStyles.styles;
   for(var i = 0; i < namedStylesList.length; i++){
     className = "." + namedStylesList[i].namedStyleType;
-    textInfo = namedStylesList[i].textStyle;
-    bold = textInfo.bold ? "font-weight: bold;" : "font-weight: normal;";
-    italics = textInfo.italics ? "font-style: italic\;" : "font-style: normal;";
-    if(textInfo.underline & textInfo.strikethrough){
-      text_decoration = "text-decoration: underline line-through;";
-    }
-    else if(textInfo.underline){
-      text_decoration = "text-decoration: underline;";
-    }
-    else if(textInfo.strikethrough){
-      text_decoration = "text-decoration: strikethrough;";
-    }
-    else{
-      text_decoration = "text-decoration: none;";
-    }
-
-    backgroundColor = "";
-    if ('backgroundColor' in textInfo) {
-      var bColour = {
-        red: '00',
-        blue: '00',
-        green: '00',
-      }
-      if (textInfo?.backgroundColor?.color?.rgbColor?.red) {
-        var redBg = (parseInt(textInfo.backgroundColor.color.rgbColor.red * 255)).toString(16)
-        bColour.red = redBg
-      }
-      if (textInfo?.backgroundColor?.color?.rgbColor?.green) {
-        var greenBg = (parseInt(textInfo.backgroundColor.color.rgbColor.green * 255)).toString(16)
-        bColour.green = greenBg
-      }
-      if (textInfo?.backgroundColor?.color?.rgbColor?.blue) {
-        var blueBg = (parseInt(textInfo.backgroundColor.color.rgbColor.blue * 255)).toString(16)
-        bColour.blue = blueBg
-      }
-      backgroundColor += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + ';'
-    }
-    
-    color = "";
-    if ('foregroundColor' in textInfo) {
-      var fColour = {
-        red: '00',
-        blue: '00',
-        green: '00'
-      }
-      if (textInfo?.foregroundColor?.color?.rgbColor?.red) {
-        var redFg = (parseInt(textInfo.foregroundColor.color.rgbColor.red * 255)).toString(16);
-        fColour.red = redFg;
-      }
-      if (textInfo?.foregroundColor?.color?.rgbColor?.green) {
-        var greenFg = (parseInt(textInfo.foregroundColor.color.rgbColor.green * 255)).toString(16);
-        fColour.green = greenFg;
-      }
-      if (textInfo?.foregroundColor?.color?.rgbColor?.blue) {
-        var blueFg = (parseInt(textInfo.foregroundColor.color.rgbColor.blue * 255)).toString(16);
-        fColour.blue = blueFg;
-      }
-      color += 'color:' + '#' + fColour.red + fColour.green + fColour.blue + ';'
-    }
-
-    font_family = "";
-    if(textInfo?.weightedFontFamily?.fontFamily){
-      font_family = "font-family: " + textInfo?.weightedFontFamily?.fontFamily + ";";
-    }
-
-    font_size = "";
-    if(textInfo?.weightedFontFamily?.weight){
-      font_size = "font-weight: " + textInfo?.weightedFontFamily?.weight + ";";
-    }
-
-    attributes = [bold, italics, text_decoration, backgroundColor, color, font_size, font_family];
+    attributes = parseTextStyle(namedStylesList[i].textStyle);
     cssOutput += className + "{\n"
     for(var j = 0; j < attributes.length; j++){
       if(attributes[j] != ""){
@@ -175,7 +151,32 @@ function makeCssClasses(doc){
       }
     }
     cssOutput += "}\n";
+
   }
+
+  if("list" in doc){
+    for(var listSectionName in doc.lists){
+      nestingLevels = doc.lists[listSectionName];
+      for(var i = 0; i < nestingLevels.length; i++){
+        cssOutput += listSectionName + toString(i) + "{";
+        levelFormatting = nestingLevels[i];
+        text_align_string = levelFormatting.bulletAlignment;
+        if(text_align_string == "START" | text_align_string == "BULLET_ALIGNMENT_UNSPECIFIED"){
+          "text-align: left;"
+        }
+        else if(text_align_string == "END"){
+          "text-align: right;"
+        }
+        else{
+          "text-align: center;"
+        }
+        
+        padding_left = "padding-left: " + levelFormatting.indentFirstLine.magnitude + levelFormatting.indentFirstLine.unit;
+        text_indent = "text-indent: " + + levelFormatting.indentStart.magnitude + levelFormatting.indentStart.unit;
+      }
+    }
+  }
+
   return cssOutput;
 }
 
@@ -187,11 +188,11 @@ const rawdata = fs.readFileSync('testDoc.json')
 const doc = JSON.parse(rawdata)
 fs.writeFile('test.html', docToHTML(doc), function (err) {
   if (err) throw err
-  console.log('HTML Updated!')
+  console.log('Updated!')
 })
-fs.writeFile('styles.css', makeCssClasses(doc), function (err) {
+fs.writeFile('style.css', makeCssClasses(doc), function (err) {
   if (err) throw err
-  console.log('CSS Updated!')
+  console.log('Updated!')
 })
 
 // ConvertGoogleDocToCleanHtml(doc);
@@ -236,67 +237,26 @@ fs.writeFile('styles.css', makeCssClasses(doc), function (err) {
 // }
 
 function processParagraph (item, html, doc) {
-
-  
-  if(item.paragraph.bullet){
-    inBullet = true
-  }
-  else{
-    inBullet = false
-  }
-
   html += '\n'
   html += '<div class=' + item.paragraph.paragraphStyle.namedStyleType + '>'
   html += '\n'
+
+  html = processBullet(item.paragraph.element[i]);
+  
+
   var numElements = item.paragraph.elements.length
   for (var i = 0; i < numElements; i++) {
     html = processElement(item.paragraph.elements[i], html, doc)
   }
-
   html += '</div>'
   html += '\n'
   return html
 }
 
 function processElement (item, html, doc) {
+  console.log(item)
   if ('textRun' in item) {
-
-    var textInput = new RegExp("\([a-zA-Z])+:_+");
-    // process as a form tag
-    if(item.textRun.content==="\u003cform\n" && !inForm){
-      html+='<form>'
-      inForm=true
-    }
-    //end form tag
-    else if(item.textRun.content==="\u003e\n" && inForm){
-      html+='</form>'
-      inForm=false
-    }
-    else if(inForm && inBullet){
-      var str = item.textRun.content
-      html+='<input type="radio" id="'+str+'" name="poggers">'
-      html+='<label for="'+str'">'+str+'</label><br>'
-    }
-    else if(inForm && textInput.test(item.textRun.content)){
-      var str = item.textRun.content
-      var res = str.split(":");
-      val n = res[0]
-      html += '<label for="'+n+'">'+n+'</label>'
-      html += '<input id="'+n+'" name="'+n+'">'
-    }
-    else if(inForm && item.textRun.content.toLowerCase()==="submit\n"){
-      html += '<input type="submit" value="Submit">'
-    }
-    
-
-
-    else if (item.textRun.content === '\n') {
-      html += '<br>'
-    }
     html = processText(item.textRun, html, doc)
-  }
-  if ('inlineObjectElement' in item) {
-    html = processImage(item.inlineObjectElement, html, doc)
   }
   return html
 }
@@ -313,16 +273,16 @@ function processText (textRun, html, doc) {
       blue: '00',
       green: '00'
     }
-    if ('red' in textRun.textStyle.backgroundColor.color?.rgbColor) {
-      var redBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.red * 255)).toString(16)
+    if ('red' in textRun.textStyle.backgroundColor.color.rgbColor) {
+      var redBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.red) * 255).toString(16)
       bColour.red = redBg
     }
-    if ('green' in textRun.textStyle.backgroundColor.color?.rgbColor) {
-      var greenBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.green * 255)).toString(16)
+    if ('green' in textRun.textStyle.backgroundColor.color.rgbColor) {
+      var greenBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.green) * 255).toString(16)
       bColour.green = greenBg
     }
-    if ('blue' in textRun.textStyle.backgroundColor.color?.rgbColor) {
-      var blueBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.blue * 255)).toString(16)
+    if ('blue' in textRun.textStyle.backgroundColor.color.rgbColor) {
+      var blueBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.blue) * 255).toString(16)
       bColour.blue = blueBg
     }
     html += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + ';'
@@ -335,15 +295,15 @@ function processText (textRun, html, doc) {
       green: '00'
     }
     if ('red' in textRun.textStyle.foregroundColor.color.rgbColor) {
-      var redFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.red * 255)).toString(16)
+      var redFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.red) * 255).toString(16)
       fColour.red = redFg
     }
     if ('green' in textRun.textStyle.foregroundColor.color.rgbColor) {
-      var greenFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.green * 255)).toString(16)
+      var greenFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.green) * 255).toString(16)
       fColour.green = greenFg
     }
     if ('blue' in textRun.textStyle.foregroundColor.color.rgbColor) {
-      var blueFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.blue * 255)).toString(16)
+      var blueFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.blue) * 255).toString(16)
       fColour.blue = blueFg
     }
     html += 'color:' + '#' + fColour.red + fColour.green + fColour.blue + ';'
@@ -351,13 +311,12 @@ function processText (textRun, html, doc) {
 
   if ('fontSize' in textRun.textStyle) {
     var fontSize = 1.33 * textRun.textStyle.fontSize.magnitude
-    html += 'font-size:' + fontSize + 'px;'
+    html += 'font-size:' + fontSize + ';'
   }
 
   if ('weightedFontFamily' in textRun.textStyle) {
-    console.log(textRun.textStyle.weightedFontFamily.weight)
     html += 'font-family:' + textRun.textStyle.weightedFontFamily.fontFamily + ';'
-    html += 'font-weight:' + textRun.textStyle.weightedFontFamily.weight.toString() + ';'
+    html += 'font-weight:' + textRun.textStyle.weightedFontFamily.fontWeight + ';'
   }
 
   html += '">'
@@ -376,7 +335,7 @@ function processText (textRun, html, doc) {
   }
   if ('link' in textRun.textStyle) {
     // add handling for bookmarkId or heading Id
-    html += '<a href="' + textRun.textStyle.link.url + '" rel="nofollow">'
+    html += '<a href="' + textRun.link.url + '" rel="nofollow">'
   }
 
   html += text
@@ -403,8 +362,8 @@ function processText (textRun, html, doc) {
 }
 
 function processImage (item, images, output, doc) {
-  var id = item.inlineObjectId
+  var id = item.inlineObjectElement.inlineObjectId
   var uri = doc.inlineObjects[id].inlineObjectProperties.embeddedObject.imageProperties.contentUri
 
-  html += '<img src=' + uri + 'alt' + id + 'id=' + id + '>'
+  output.push('<img src=' + uri + 'alt' + id + 'id=' + id)
 }
