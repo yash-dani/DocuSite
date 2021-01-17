@@ -46,18 +46,29 @@ app.get('/convert/:docUrl', function (req, res) {
 })
 
 app.get('/oauth2callback', async (req, res) => {
-  console.log('hi')
   const { tokens } = await oauth2Client.getToken(req.query.code)
   oauth2Client.setCredentials(tokens)
   const response = await docs.documents.get({ documentId: docUrl })
   console.log(response.data)
 })
 
+const baseURL = 'https://docs.googleapis.com/v1/documents/'
+
+app.get('/convertAuth/:docUrl', async (req, res) => {
+  docUrl = req.params.docUrl
+  const something = await getDocAsJson(baseURL, docUrl)
+  console.log(something)
+})
+
 const getDocAsJson = async (baseURL, docId) => {
   // note: authorization scope must be added to the request
   try {
     console.log(docId)
-    const res = await fetch(baseURL + docId)
+    const res = await fetch(baseURL + docId, {
+      headers: {
+        Authorization: 'Bearer ya29.a0AfH6SMB25PY7Hf5qo59UUxwPYOQAis5AB6b43EzRGPngwwWjG5V7IEJFOGJkvuZeIn7_ojxeO-Wa4BqOZjzNj2_FB8pq5_OHa4IBqZuj1dlJP-lz186TyjVmnXbsFF-pIk1vZ06SJMMNH2fHFlCL9XgFO5dD9KQlQLTGAmgvzF8'
+      }
+    })
     const data = await res.json()
     return data
   } catch (error) {
