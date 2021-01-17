@@ -219,7 +219,7 @@ function makeCssClasses(doc){
 function processParagraph (item, html, doc) {
 
   
-  if(item.paragraph.bullet){
+  if(item?.paragraph?.bullet){
     inBullet = true
   }
   else{
@@ -415,21 +415,41 @@ function processImage (item, html, doc) {
 const fs = require('fs')
 const rawdata = fs.readFileSync('testDoc.json')
 const doc = JSON.parse(rawdata)
-fs.writeFile('test.html', docToHTML(doc), function (err) {
-  if (err) throw err
-  console.log('HTML Updated!')
-})
-fs.writeFile('styles.css', makeCssClasses(doc), function (err) {
-  if (err) throw err
-  console.log('CSS Updated!')
-})
 
-var shell = require('shelljs');
-shell.cp('test.html', 'my-site/public/index.html');
-shell.cp('styles.css', 'my-site/public/styles.css');
-shell.cd('my-site');
-a = shell.exec('wrangler publish', function(code, stdout, stderr) {
-  //var testUrl = stdout.match(/'(https?:[^\s]+)'/),
-    //onlyUrl = testUrl && testUrl[1];
-    console.log(stderr.split('\n')[5]);
-});
+function test() {
+  return '';
+}
+
+function deploySite(obj) {
+  var shell = require('shelljs');
+  fs.writeFileSync('test.html', docToHTML(obj), function (err) {
+    if (err) throw err
+    console.log('HTML Updated!')
+  })
+  fs.writeFileSync('styles.css', makeCssClasses(obj), function (err) {
+    if (err) throw err
+    console.log('CSS Updated!')
+  })
+  var dt = new Date();
+    while ((new Date()) - dt <= 15000) { /* Do nothing */ }
+  //docToHTML(obj);
+  shell.cp('test.html', 'my-site/public/index.html');
+  shell.cp('styles.css', 'my-site/public/styles.css');
+  shell.cd('my-site');
+
+  out = ''
+  // a = shell.exec('wrangler publish', async function(code, stdout, stderr) {
+  //     //console.log('IT WORKS ', stderr.split('\n')[5]);
+  //     b = stderr.split('\n')[5];
+  //     out.test = b;
+  // });
+  a = shell.exec('wrangler publish').stderr.split('\n')[5];
+  shell.cd('..');
+  //test = await setTimeout(test, 15000, 'funky');
+  console.log("OUT ", a);
+  return a;
+}
+//deploySite(doc);
+module.exports = {
+  deploySite
+};

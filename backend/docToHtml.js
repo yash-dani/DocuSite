@@ -3,6 +3,7 @@ const express = require('express')
 const fetch = require('node-fetch')
 const { google } = require('googleapis')
 const docs = google.docs('v1')
+var toHTML = require('./scrapeDocs');
 
 // Start up an instance of app
 const app = express()
@@ -57,7 +58,10 @@ const baseURL = 'https://docs.googleapis.com/v1/documents/'
 app.get('/convertAuth/:docUrl', async (req, res) => {
   docUrl = req.params.docUrl.split('/')[5]
   const something = await getDocAsJson(baseURL, docUrl)
-  console.log(something)
+  console.log(something);
+  a = await toHTML.deploySite(something);
+  console.log(a);
+  res.send(a)
 })
 
 const getDocAsJson = async (baseURL, docId) => {
@@ -66,7 +70,7 @@ const getDocAsJson = async (baseURL, docId) => {
     console.log(docId)
     const res = await fetch(baseURL + docId, {
       headers: {
-        Authorization: 'Bearer ya29.a0AfH6SMB25PY7Hf5qo59UUxwPYOQAis5AB6b43EzRGPngwwWjG5V7IEJFOGJkvuZeIn7_ojxeO-Wa4BqOZjzNj2_FB8pq5_OHa4IBqZuj1dlJP-lz186TyjVmnXbsFF-pIk1vZ06SJMMNH2fHFlCL9XgFO5dD9KQlQLTGAmgvzF8'
+        Authorization: 'Bearer ya29.a0AfH6SMCdGbOyJ42C1Hl4w7WnKbgaeqNLdA7BjDiobWzvnU0onWoy_AsOHf_TtThMGiRJ5vqpdjcjnhECSWY_ek4YpgSIfRir7LD_j9iAMKOtG-Rj2FOw0hz-mIPsaSykatj1P5K2qSLsOtmu1Z1lGGJF0nLqtIH9zVf7gJmPBlQ'
       }
     })
     const data = await res.json()
