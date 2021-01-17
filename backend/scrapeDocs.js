@@ -88,7 +88,7 @@ function addPageFormatting(html, doc) {
 // INPUT: html string, document object title
 // OUTPUT: updated html string
 function parseTitle (html, title) {
-  headTag = '<!DOCTYPE html>\n<head>\n    <title>' + title + '</title>\n</head>'
+  headTag = '<!DOCTYPE html>\n<head>\n    <title>' + title + '</title>\n<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">\n</head>'
   return headTag
 }
 
@@ -259,18 +259,30 @@ function processElement (item, html, doc) {
     }
     else if(inForm && inBullet){
       var str = item.textRun.content.replace(/^\s+|\s+$/g, '')
-      html+='<input type="radio" id="'+str+'" name="poggers">'
+      html+='<div class="form-group">'
+      html+='<input  type="radio" id="'+str+'" name="poggers">'
       html+='<label for="'+str+'">'+str+'</label><br>'
+      html+='</div>'
+
     }
     else if(inForm && textInput.test(item.textRun.content)){
       var str = item.textRun.content.replace(/^\s+|\s+$/g, '')
       var res = str.split(":");
       var n = res[0]
-      html += '<label for="'+n+'">'+n+'</label>'
-      html += '<input id="'+n+'" name="'+n+'">'
+      html+='<div class="form-group" style="width:100%">'
+      // html+='<div class="col-xs-3">'
+      // html+='</div>'
+      // html+=' <div class="col-xs-12">'
+      html += '<label  for="'+n+'">'+n+'</label><br>'
+      html += '<input class="form-control" id="'+n+'" name="'+n+'">'
+
+      // html+='</div>'
+      // html+=' <div class="col-xs-3">'
+      // html+='</div>'
+      html+='</div>'
     }
     else if(inForm && item.textRun.content.toLowerCase()==="submit\n"){
-      html += '<input type="submit" value="Submit">'
+      html += '<br><input type="submit" class="btn btn-outline-secondary" value="Submit">'
     }
     else if (item.textRun.content === '\n') {
       html += '<br>'
@@ -426,38 +438,38 @@ function test() {
     console.log('CSS Updated!')
   })
 }
-// test()
+test()
 
-function deploySite(obj) {
-  var shell = require('shelljs');
-  fs.writeFileSync('test.html', docToHTML(obj), function (err) {
-    if (err) throw err
-    console.log('HTML Updated!')
-  })
-  fs.writeFileSync('styles.css', makeCssClasses(obj), function (err) {
-    if (err) throw err
-    console.log('CSS Updated!')
-  })
-  var dt = new Date();
-    while ((new Date()) - dt <= 15000) { /* Do nothing */ }
-  //docToHTML(obj);
-  shell.cp('test.html', 'my-site/public/index.html');
-  shell.cp('styles.css', 'my-site/public/styles.css');
-  shell.cd('my-site');
+// function deploySite(obj) {
+//   var shell = require('shelljs');
+//   fs.writeFileSync('test.html', docToHTML(obj), function (err) {
+//     if (err) throw err
+//     console.log('HTML Updated!')
+//   })
+//   fs.writeFileSync('styles.css', makeCssClasses(obj), function (err) {
+//     if (err) throw err
+//     console.log('CSS Updated!')
+//   })
+// //   var dt = new Date();
+// //     while ((new Date()) - dt <= 15000) { /* Do nothing */ }
+// //   //docToHTML(obj);
+// //   shell.cp('test.html', 'my-site/public/index.html');
+// //   shell.cp('styles.css', 'my-site/public/styles.css');
+// //   shell.cd('my-site');
 
-  out = ''
-  // a = shell.exec('wrangler publish', async function(code, stdout, stderr) {
-  //     //console.log('IT WORKS ', stderr.split('\n')[5]);
-  //     b = stderr.split('\n')[5];
-  //     out.test = b;
-  // });
-  a = shell.exec('wrangler publish').stderr.split('\n')[5];
-  shell.cd('..');
-  //test = await setTimeout(test, 15000, 'funky');
-  console.log("OUT ", a);
-  return a;
-}
-//deploySite(doc);
-module.exports = {
-  deploySite
-};
+// //   out = ''
+// //   // a = shell.exec('wrangler publish', async function(code, stdout, stderr) {
+// //   //     //console.log('IT WORKS ', stderr.split('\n')[5]);
+// //   //     b = stderr.split('\n')[5];
+// //   //     out.test = b;
+// //   // });
+// //   a = shell.exec('wrangler publish').stderr.split('\n')[5];
+// //   shell.cd('..');
+// //   //test = await setTimeout(test, 15000, 'funky');
+// //   console.log("OUT ", a);
+// //   return a;
+// // }
+// // //deploySite(doc);
+// // module.exports = {
+// //   deploySite
+// };
