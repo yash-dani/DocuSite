@@ -18,7 +18,7 @@ function docToHTML (doc) {
   html += '>\n'
   // import fonts and start of body tag
   html += fontString
-
+  html += styleString
   // parse the body, adding html elements
   html = parseBody(html, doc)
   // add last body tag
@@ -179,61 +179,6 @@ function makeCssClasses(doc){
   return cssOutput;
 }
 
-// IGNORE THE REST OF THIS CODE (IT'S JUST A TEST BENCH + OTHER REFERENCES)
-
-// Dummy/test setup (opening a test file and running the function on it)
-const fs = require('fs')
-const rawdata = fs.readFileSync('testDoc.json')
-const doc = JSON.parse(rawdata)
-fs.writeFile('test.html', docToHTML(doc), function (err) {
-  if (err) throw err
-  console.log('HTML Updated!')
-})
-fs.writeFile('styles.css', makeCssClasses(doc), function (err) {
-  if (err) throw err
-  console.log('CSS Updated!')
-})
-
-// ConvertGoogleDocToCleanHtml(doc);
-
-// RANDOM GITHUB SCRIPT TESTING
-// function ConvertGoogleDocToCleanHtml (doc) {
-//   var body = doc.body.content
-//   var numChildren = body.length
-//   var output = []
-//   var images = []
-//   var listCounters = {}
-
-//   // Walk through all the child elements of the body.
-//   for (var i = 0; i < numChildren; i++) {
-//     var child = body.content[i]
-//     output.push(processItem(child, listCounters, images, doc))
-//   }
-
-//   var html = output.join('\r')
-//   // emailHtml(html, images);
-//   console.log(html)
-//   // createDocumentForHtml(html, images);
-// }
-
-// function emailHtml (html, images) {
-//   var attachments = []
-//   for (var j = 0; j < images.length; j++) {
-//     attachments.push({
-//       fileName: images[j].name,
-//       mimeType: images[j].type,
-//       content: images[j].blob.getBytes()
-//     })
-//   }
-// }
-
-// function createDocumentForHtml (html, images) {
-//   var name = DocumentApp.getActiveDocument().getName() + '.html'
-//   var newDoc = DocumentApp.create(name)
-//   newDoc.getBody().setText(html)
-//   for (var j = 0; j < images.length; j++) { newDoc.getBody().appendImage(images[j].blob) }
-//   newDoc.saveAndClose()
-// }
 
 function processParagraph (item, html, doc) {
 
@@ -422,3 +367,27 @@ function processImage (item, html, doc) {
   html += '">'
   return html
 }
+
+// IGNORE THE REST OF THIS CODE (IT'S JUST A TEST BENCH + OTHER REFERENCES)
+
+// Dummy/test setup (opening a test file and running the function on it)
+const fs = require('fs')
+const rawdata = fs.readFileSync('testDoc.json')
+const doc = JSON.parse(rawdata)
+fs.writeFile('test.html', docToHTML(doc), function (err) {
+  if (err) throw err
+  console.log('HTML Updated!')
+})
+fs.writeFile('styles.css', makeCssClasses(doc), function (err) {
+  if (err) throw err
+  console.log('CSS Updated!')
+})
+/*
+var shell = require('shelljs');
+shell.cp('test.html', 'my-site/public/index.html');
+shell.cd('my-site');
+a = shell.exec('wrangler publish', function(code, stdout, stderr) {
+  //var testUrl = stdout.match(/'(https?:[^\s]+)'/),
+    //onlyUrl = testUrl && testUrl[1];
+    console.log(stderr.split('\n')[5]);
+});*/
