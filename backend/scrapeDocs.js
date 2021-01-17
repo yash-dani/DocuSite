@@ -376,7 +376,7 @@ function processText (textRun, html, doc) {
     // add handling for bookmarkId or heading Id
     html += '<a href="' + textRun.textStyle.link.url + '" rel="nofollow" style="color: inherit;text-decoration:inherit">'
   }
-
+  text = text.replace(/\s/g, '&nbsp')
   html += text
 
   if ('link' in textRun.textStyle) {
