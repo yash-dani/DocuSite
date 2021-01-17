@@ -18,7 +18,9 @@ function docToHTML (doc) {
   html += '>\n'
   // import fonts and start of body tag
   html += fontString
-
+  if ('defaultHeaderId' in doc.documentStyle) {
+    html = parseHeader(html, doc)
+  }
   // parse the body, adding html elements
   html = parseBody(html, doc)
   // add last body tag
@@ -57,7 +59,7 @@ function addPageFormatting(html, doc) {
   var marginHeader = 1.33 * doc.documentStyle.marginHeader.magnitude
   var pageHeight = 1.33 * doc.documentStyle.pageSize.height.magnitude
 
-  html += 'margin-top:' + marginHeader + 'px;'
+  html += 'margin-top:' + marginTop + 'px;'
   html += 'margin-bottom:' + marginBottom + 'px;'
   html += 'margin-left:' + marginLeft + 'px;'
   html += 'margin-right:' + marginRight + 'px;'
@@ -73,6 +75,14 @@ function addPageFormatting(html, doc) {
 function parseTitle (html, title) {
   headTag = '<!DOCTYPE html>\n<head>\n    <title>' + title + '</title>\n</head>'
   return headTag
+}
+
+function parseHeader (html, doc) {
+  var headerId = doc.documentStyle.defaultHeaderId
+  for (var i = 0; i < doc.headers[headerId].content.length; i++) {
+    html = processParagraph(doc.headers[headerId].content[i], html, doc)
+  }
+  return html
 }
 
 // Secondary Script: Create <body> tag using Google Doc
