@@ -222,8 +222,9 @@ function processParagraph (item, html, doc) {
   html += '<div class=' + item.paragraph.paragraphStyle.namedStyleType + '>'
   html += '\n'
 
-  if(item?.paragraph?.bullets){
-    html += "<p style=\"display:inline\">•</p>"
+  if(item?.paragraph?.bullet){
+    html += "<p style=\"display:inline\"> • </p>"
+    console.log("Kevin");
   }
 
   var numElements = item.paragraph.elements.length
