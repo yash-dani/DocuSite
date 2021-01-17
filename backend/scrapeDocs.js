@@ -17,19 +17,12 @@ function docToHTML (doc) {
   html = addPageFormatting(html, doc)
   html += '>\n'
   // import fonts and start of body tag
-<<<<<<< HEAD
   html += fontString
+  html += styleString;
   if ('defaultHeaderId' in doc.documentStyle) {
     html = parseHeader(html, doc)
   }
-||||||| merged common ancestors
-  html += fontString
 
-=======
-  html += fontString;
-  html += styleString;
-
->>>>>>> 3fa55dec1d2a861628fd0d71fe090726eeef55c9
   // parse the body, adding html elements
   html = parseBody(html, doc)
   // add last body tag

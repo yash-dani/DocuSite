@@ -40,5 +40,5 @@ const getDocAsJson = async (baseURL, docId) => {
 
 function convertDocToHTML (data) {
   // convert doc to html and return it
-  
+
 };
