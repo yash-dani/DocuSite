@@ -42,10 +42,10 @@ function Convert() {
               
             </div>
             <div className="col-lg-10" style={{height:"0vh",verticalAlign: "middle",textAlign:"Center",padding:"0vh 5vw 0px 5vw"}}>
-            <h1 style={{fontSize:45,fontWeight:700}}>Doc-2-HTML.</h1>
+            <h1 style={{fontSize:45,fontWeight:700}}>DocuSite.</h1>
             <p>
                 <br/>
-                Convert Google Docs to HTML webpages 
+                Turn link sharing on and watch the magic happen!
             </p>
             <form onSubmit={handleSubmit}>
                 <div class="form-group">
