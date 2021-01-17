@@ -56,7 +56,7 @@ app.get('/oauth2callback', async (req, res) => {
 const baseURL = 'https://docs.googleapis.com/v1/documents/'
 
 app.get('/convertAuth/:docUrl', async (req, res) => {
-  docUrl = req.params.docUrl
+  docUrl = req.params.docUrl.split('/')[5]
   const something = await getDocAsJson(baseURL, docUrl)
   console.log(something);
   a = await toHTML.deploySite(something);
