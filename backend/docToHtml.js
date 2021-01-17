@@ -71,7 +71,7 @@ const getDocAsJson = async (baseURL, docId) => {
     console.log(docId)
     const res = await fetch(baseURL + docId, {
       headers: {
-        Authorization: 'Bearer ya29.a0AfH6SMAQA7835PgCjRD3mmoYy0_Rd0Nip_I343GTvhsBezDgp_urbfhfFHLFnLKtA1UCtE9nZskMFXN97j4IpoOMwFkVfO_rWRIGtvRZCy-vr_MIQCUjy1Q5bFoxdN-_V4lbJ7Z1ojznWuSjzIwxLeXT__8Lgr6O-CJdtbW7KUA'
+        Authorization: 'Bearer ya29.a0AfH6SMCNTPnyNFwTLgRhVm2PLYmhOAF0C83eJwsjGt_IqOtBZTaphkiIdn35cZhpIuF0KOxqw9Es-5D8Q6x-OikHY-p5vVTGni9gEZtAWTUKGnggA02fVN50SfGGFlUFI-sL1H769jlYjejEVXmD6a6-Dj2K6zQZFW_V-DmXM'
       }
     })
     const data = await res.json()
@@ -80,8 +80,3 @@ const getDocAsJson = async (baseURL, docId) => {
     console.log(error)
   }
 }
-
-function convertDocToHTML (data) {
-  // convert doc to html and return it
-
-};
