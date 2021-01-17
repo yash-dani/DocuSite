@@ -4,7 +4,7 @@
 *   OUTPUT: HTML string
 */
 // holds the really ugly import string for google fonts
-const fontString = "<style>\n       @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:ital,wght@0,100;0,200;1,100;1,200&family=Open+Sans&display=swap');\n</style>"
+const fontString = "<style>             @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,600;0,700;0,900;1,300;1,400;1,600;1,700;1,900&display=swap%27');</style>"
 const styleString = "<link rel=\"stylesheet\" href=\"styles.css\">"
 var inForm = false;
 var inBullet = false
@@ -17,10 +17,19 @@ function docToHTML (doc) {
   html = addPageFormatting(html, doc)
   html += '>\n'
   // import fonts and start of body tag
+<<<<<<< HEAD
   html += fontString
   if ('defaultHeaderId' in doc.documentStyle) {
     html = parseHeader(html, doc)
   }
+||||||| merged common ancestors
+  html += fontString
+
+=======
+  html += fontString;
+  html += styleString;
+
+>>>>>>> 3fa55dec1d2a861628fd0d71fe090726eeef55c9
   // parse the body, adding html elements
   html = parseBody(html, doc)
   // add last body tag
@@ -58,12 +67,14 @@ function addPageFormatting(html, doc) {
   var marginRight = 1.33 * doc.documentStyle.marginRight.magnitude
   var marginHeader = 1.33 * doc.documentStyle.marginHeader.magnitude
   var pageHeight = 1.33 * doc.documentStyle.pageSize.height.magnitude
+  
 
   html += 'margin-top:' + marginTop + 'px;'
   html += 'margin-bottom:' + marginBottom + 'px;'
   html += 'margin-left:' + marginLeft + 'px;'
   html += 'margin-right:' + marginRight + 'px;'
-  html += 'height:' + pageHeight + 'px;'
+  // html += 'height:' + pageHeight + 'px;'
+  // html += 'height:100%;'
   html += '"'
 
   return (html)
@@ -351,7 +362,10 @@ function processElement (item, html, doc) {
       html += '<br>'
     }
     else{
-      html = processText(item.textRun, html, doc)
+      if(inBullet){
+        html += "<p style=\"display:inline\"> • </p>";
+      }
+      html = processText(item.textRun, html, doc);
     }
   }
   if ('inlineObjectElement' in item) {
