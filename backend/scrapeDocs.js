@@ -287,13 +287,12 @@ function processElement (item, html, doc) {
     else if(inForm && item.textRun.content.toLowerCase()==="submit\n"){
       html += '<input type="submit" value="Submit">'
     }
-    
-
-
     else if (item.textRun.content === '\n') {
       html += '<br>'
     }
-    html = processText(item.textRun, html, doc)
+    else{
+      html = processText(item.textRun, html, doc)
+    }
   }
   if ('inlineObjectElement' in item) {
     html = processImage(item.inlineObjectElement, html, doc)
