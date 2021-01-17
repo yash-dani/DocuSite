@@ -1,0 +1,56 @@
+.NORMAL_TEXT{
+font-weight: normal;
+font-style: normal;
+text-decoration: none;
+background-color:#000000;
+color:#000000;
+font-weight: 400;
+font-family: Arial;
+}
+.HEADING_1{
+font-weight: normal;
+font-style: normal;
+text-decoration: none;
+}
+.HEADING_2{
+font-weight: normal;
+font-style: normal;
+text-decoration: none;
+}
+.HEADING_3{
+font-weight: normal;
+font-style: normal;
+text-decoration: none;
+color:#434343;
+}
+.HEADING_4{
+font-weight: normal;
+font-style: normal;
+text-decoration: none;
+color:#666666;
+}
+.HEADING_5{
+font-weight: normal;
+font-style: normal;
+text-decoration: none;
+color:#666666;
+}
+.HEADING_6{
+font-weight: normal;
+font-style: normal;
+text-decoration: none;
+color:#666666;
+}
+.TITLE{
+font-weight: normal;
+font-style: normal;
+text-decoration: none;
+}
+.SUBTITLE{
+font-weight: normal;
+font-style: normal;
+text-decoration: none;
+color:#666666;
+font-weight: 400;
+font-family: Arial;
+}
