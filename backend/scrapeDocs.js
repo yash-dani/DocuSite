@@ -264,21 +264,21 @@ function processElement (item, html, doc) {
     var textInput = new RegExp("\([a-zA-Z])+:_+");
     // process as a form tag
     if(item.textRun.content==="\u003cform\n" && !inForm){
-      html+='<form>'
+      html+='<form><div>'
       inForm=true
     }
     //end form tag
-    else if(item.textRun.content==="\u003e\n" && inForm){
-      html+='</form>'
+    else if((item.textRun.content==="\u003e\n" || item.textRun.content==="\u003e") && inForm){
+      html+='</form></div>'
       inForm=false
     }
     else if(inForm && inBullet){
-      var str = item.textRun.content
+      var str = item.textRun.content.replace(/^\s+|\s+$/g, '')
       html+='<input type="radio" id="'+str+'" name="poggers">'
       html+='<label for="'+str+'">'+str+'</label><br>'
     }
     else if(inForm && textInput.test(item.textRun.content)){
-      var str = item.textRun.content
+      var str = item.textRun.content.replace(/^\s+|\s+$/g, '')
       var res = str.split(":");
       var n = res[0]
       html += '<label for="'+n+'">'+n+'</label>'
