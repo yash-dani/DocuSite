@@ -263,6 +263,56 @@ function processElement (item, html, doc) {
 
     var textInput = new RegExp("\([a-zA-Z])+:_+");
     // process as a form tag
+    ////////
+    var textRun = item.textRun
+    var bgColor = ""
+    var fgColor = ""
+    
+  if ('backgroundColor' in textRun.textStyle) {
+    var bColour = {
+      red: '00',
+      blue: '00',
+      green: '00'
+    }
+    if ('red' in textRun.textStyle.backgroundColor.color?.rgbColor) {
+      var redBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.red * 255)).toString(16)
+      bColour.red = redBg
+    }
+    if ('green' in textRun.textStyle.backgroundColor.color?.rgbColor) {
+      var greenBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.green * 255)).toString(16)
+      bColour.green = greenBg
+    }
+    if ('blue' in textRun.textStyle.backgroundColor.color?.rgbColor) {
+      var blueBg = (parseInt(textRun.textStyle.backgroundColor.color.rgbColor.blue * 255)).toString(16)
+      bColour.blue = blueBg
+    }
+    bgColor += 'background-color:' + '#' + bColour.red + bColour.green + bColour.blue + ';'
+  }
+
+  if ('foregroundColor' in textRun.textStyle) {
+    var fColour = {
+      red: '00',
+      blue: '00',
+      green: '00'
+    }
+    if ('red' in textRun.textStyle.foregroundColor.color.rgbColor) {
+      var redFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.red * 255)).toString(16)
+      fColour.red = redFg
+    }
+    if ('green' in textRun.textStyle.foregroundColor.color.rgbColor) {
+      var greenFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.green * 255)).toString(16)
+      fColour.green = greenFg
+    }
+    if ('blue' in textRun.textStyle.foregroundColor.color.rgbColor) {
+      var blueFg = (parseInt(textRun.textStyle.foregroundColor.color.rgbColor.blue * 255)).toString(16)
+      fColour.blue = blueFg
+    }
+    fgColor += 'color:' + '#' + fColour.red + fColour.green + fColour.blue + ';'
+  }
+
+  var style = 'style="'+bgColor+' '+fgColor+'" '
+    ///////
+
     if(item.textRun.content==="\u003cform\n" && !inForm){
       html+='<form><div>'
       inForm=true
@@ -275,13 +325,13 @@ function processElement (item, html, doc) {
     else if(inForm && inBullet){
       var str = item.textRun.content.replace(/^\s+|\s+$/g, '')
       html+='<input type="radio" id="'+str+'" name="poggers">'
-      html+='<label for="'+str+'">'+str+'</label><br>'
+      html+='<label '+style+'for="'+str+'">'+str+'</label><br>'
     }
     else if(inForm && textInput.test(item.textRun.content)){
       var str = item.textRun.content.replace(/^\s+|\s+$/g, '')
       var res = str.split(":");
       var n = res[0]
-      html += '<label for="'+n+'">'+n+'</label>'
+      html += '<label '+style+' for="'+n+'">'+n+'</label>'
       html += '<input id="'+n+'" name="'+n+'">'
     }
     else if(inForm && item.textRun.content.toLowerCase()==="submit\n"){
