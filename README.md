@@ -1,2 +1,1 @@
-@carl, make your create-react-app in some sort of "frontend" folder or something (easy to compartmentalize lol)
-
+https://twitter.com/itsyashdani/status/1369442914867232769
